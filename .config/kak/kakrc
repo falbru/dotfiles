@@ -1,0 +1,177 @@
+# haukkagu's kakoune config
+
+# misc
+colorscheme gruvbox-dark
+set-option global ui_options terminal_assistant=none terminal_set_title=false
+add-highlighter global/ regex \b(TODO|FIXME|XXX|NOTE)\b 0:default+rb
+
+# statusline
+set-option global modelinefmt '%val{bufname} {comment}(%opt{filetype}) {value}%val{cursor_line}:%val{cursor_char_column} {default}{{context_info}} {{mode_info}} - %val{client}@[%val{session}]'
+
+# tab/indent width
+set-option global tabstop 4
+set-option global indentwidth %opt{tabstop}
+
+# number lines
+add-highlighter global/ show-matching
+hook global BufCreate .* %[
+    add-highlighter buffer/ number-lines -relative -hlcursor
+    add-highlighter buffer/ wrap
+]
+
+# switch cursor color in insert mode
+set-face global InsertCursor black,blue
+
+hook global ModeChange .*:.*:insert %{
+    set-face window PrimaryCursor InsertCursor
+    set-face window PrimaryCursorEol InsertCursor
+}
+
+hook global ModeChange .*:insert:.* %{ try %{
+    unset-face window PrimaryCursor
+    unset-face window PrimaryCursorEol
+}}
+
+# basic mappings
+map global normal '#' ':comment-line<ret>'
+map global insert <c-w> '<esc>bdi'
+map global user -docstring 'delete buffer' x ':delete-buffer<ret>'
+
+map global normal æ "'"
+map global normal Æ '"'
+map global normal ø ';'
+map global normal Ø ':'
+map global normal å '['
+map global normal Å '{'
+
+map global user -docstring 'grep' g ':grep '
+hook global -always BufOpenFifo '\*grep\*' %{ map global normal <minus> ': grep-next-match<ret>' }
+
+# enable <tab>/<s-tab> for insert completion selection
+hook global InsertCompletionShow .* %{ map window insert <tab> <c-n>; map window insert <s-tab> <c-p> }
+hook global InsertCompletionHide .* %{ unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p> }
+
+# clipboard
+evaluate-commands %sh{
+    if [ -n "$SSH_TTY" ]; then
+        copy='printf "\033]52;;%s\033\\" $(base64 | tr -d "\n") > $( [ -n "$kak_client_pid" ] && echo /proc/$kak_client_pid/fd/0 || echo /dev/tty )'
+        paste='printf "paste unsupported through ssh"'
+        backend="OSC 52"
+    else
+        case $(uname) in
+            Linux)
+                if [ -n "$WAYLAND_DISPLAY" ]; then
+                    copy="wl-copy"; paste="wl-paste"; backend=Wayland
+                else
+                    copy="xclip -i -selection clipboard"; paste="xclip -o -selection clipboard"; backend=X11
+                fi
+                ;;
+            Darwin)  copy="pbcopy"; paste="pbpaste"; backend=OSX ;;
+        esac
+    fi
+    printf "map global user -docstring 'paste (after) from clipboard' p '<a-!>%s<ret>'\n" "$paste"
+    printf "map global user -docstring 'paste (before) from clipboard' P '!%s<ret>'\n" "$paste"
+    printf "map global user -docstring 'yank to primary' y '<a-|>%s<ret>:echo -markup %%{{Information}copied selection to %s clipboard}<ret>'\n" "$copy" "$backend"
+    printf "map global user -docstring 'replace from clipboard' R '|%s<ret>'\n" "$paste"
+}
+
+# git gutter
+hook global WinCreate .* %{ evaluate-commands %sh{
+    [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ] && printf "%s\n" "
+        git show-diff
+        hook window BufWritePost .* %{
+            git update-diff
+        }"
+}}
+
+# find file
+define-command find -docstring "find files" -params 1 %{ edit %arg{1} }
+complete-command find shell-script-candidates %{ find . -type f }
+map global user -docstring 'find file' f ':find '
+
+# language dependent settings
+source "%val{config}/languages.kak"
+
+# ide
+define-command ide %{
+    rename-client main
+    set-option global jumpclient main
+
+    shell
+    lazygit
+
+    focus main
+}
+
+# --- plugins ---
+# kak-bundle (plugin manager)
+source "%val{config}/bundle/kak-bundle/rc/kak-bundle.kak"
+bundle-noload kak-bundle https://git.sr.ht/~jdugan6240/kak-bundle
+
+# kak-lsp
+eval %sh{kak-lsp --kakoune -s $kak_session}
+
+hook global WinSetOption filetype=(javascript|typescript|c|cpp|python|go) %{
+    set-option global lsp_diagnostic_line_error_sign ' '
+    set-option global lsp_diagnostic_line_warning_sign ' '
+    set-option global lsp_diagnostic_line_info_sign ' '
+    set-option global lsp_diagnostic_line_hint_sign ' '
+    set-face global DiagnosticError red+u
+    set-face global DiagnosticWarning yellow+u
+    set-face global DiagnosticHint blue+u
+    set-face global DiagnosticInfo cyan+u
+    set-face global LineFlagError red
+    set-face global LineFlagWarning yellow
+    set-face global LineFlagHint blue
+    set-face global LineFlagInfo cyan
+
+    map window user -docstring 'enter lsp mode' l ':enter-user-mode lsp<ret>'
+    map window user -docstring 'open lsp diagnostics buffer' d ':lsp-diagnostics<ret>'
+    hook window -always BufOpenFifo '\*diagnostics\*' %{ map window normal <minus> ':lsp-find-error<ret>' }
+
+    map window normal -docstring 'open lsp hover' = ':lsp-hover<ret>'
+
+    lsp-auto-hover-insert-mode-enable
+    lsp-inlay-diagnostics-enable window
+    lsp-enable-window
+}
+
+# buffer-switcher
+bundle kakoune-buffer-switcher "https://github.com/occivink/kakoune-buffer-switcher"
+map global user -docstring 'open buffer switcher' b ':buffer-switcher<ret>'
+
+define-command -docstring 'switch to buffer at index' -params 1 buffer-switch-index %{
+    evaluate-commands %sh{
+        non_debug_elements=$(echo "$kak_quoted_buflist" | tr ' ' '\n' | grep -v "\*debug\*" | tr '\n' ' ')
+        selected_element=$(echo "$non_debug_elements" | cut -d "'" -f $(($1*2+2)))
+        if [ -z $selected_element ]; then
+            echo 'echo -markup "{Error}index out of range"'
+        else
+            echo "buffer $selected_element"
+        fi
+    }
+}
+map global normal <c-q> ':buffer-switch-index 0<ret>'
+map global normal <c-w> ':buffer-switch-index 1<ret>'
+map global normal <c-e> ':buffer-switch-index 2<ret>'
+map global normal <c-r> ':buffer-switch-index 3<ret>'
+
+## auto-pairs
+bundle auto-pairs.kak "https://github.com/alexherbo2/auto-pairs.kak" %{
+    enable-auto-pairs
+}
+
+# lf (file manager)
+bundle kak-lf 'https://github.com/haukkagu/kak-lf'
+map global user -docstring 'open lf' e ':lf<ret>'
+
+# smarttab
+bundle smarttab.kak "https://github.com/andreyorst/smarttab.kak" %{
+    hook global ModuleLoaded smarttab %{ hook global WinSetOption filetype=.* %{ set-option buffer softtabstop %opt{tabstop} } }
+    hook global WinSetOption filetype=(sh|kak|zig|javascript|typescript|css|html|yaml|meson) expandtab
+    hook global WinSetOption filetype=(python|c|cpp) smarttab
+}
+
+# Source a local project kak config if it exists
+define-command config -docstring "open local config" %{ edit .local.kak }
+try %{ source .local.kak }
