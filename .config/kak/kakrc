@@ -1,12 +1,17 @@
 # haukkagu's kakoune config
 
 # misc
-colorscheme gruvbox-dark
-set-option global ui_options terminal_assistant=none terminal_set_title=false
+set-option global grepcmd 'rg --column'
+set-option global autoreload yes
+set-option global ui_options terminal_assistant=none terminal_status_on_top=true terminal_wheel_scroll_amount=1
 add-highlighter global/ regex \b(TODO|FIXME|XXX|NOTE)\b 0:default+rb
 
 # statusline
-set-option global modelinefmt '%val{bufname} {comment}(%opt{filetype}) {value}%val{cursor_line}:%val{cursor_char_column} {default}{{context_info}} {{mode_info}} - %val{client}@[%val{session}]'
+set-option global modelinefmt '%val{bufname} {comment}%sh{ [ -n "$kak_opt_filetype" ] && printf "($kak_opt_filetype) "}{value}%val{cursor_line}:%val{cursor_char_column} {default}{{context_info}} {{mode_info}} - %val{client}@[%val{session}]'
+
+# highlighting search results
+set-face global CurSearch +u
+hook global RegisterModified '/' %{ add-highlighter -override global/search regex "%reg{/}" 0:CurSearch }
 
 # tab/indent width
 set-option global tabstop 4
@@ -30,6 +35,12 @@ hook global ModeChange .*:.*:insert %{
 hook global ModeChange .*:insert:.* %{ try %{
     unset-face window PrimaryCursor
     unset-face window PrimaryCursorEol
+}}
+
+# jk to escape
+hook global InsertChar k %{ try %{
+  exec -draft hH <a-k>jk<ret> d
+  exec <esc>
 }}
 
 # basic mappings
@@ -86,22 +97,16 @@ hook global WinCreate .* %{ evaluate-commands %sh{
 
 # find file
 define-command find -docstring "find files" -params 1 %{ edit %arg{1} }
-complete-command find shell-script-candidates %{ find . -type f }
+complete-command find shell-script-candidates %{ fd -t f -c never }
 map global user -docstring 'find file' f ':find '
 
-# language dependent settings
+# tools
+define-command shell -docstring "open shell in new terminal" %{ terminal zsh }
+define-command lazygit -docstring "open lazygit in new terminal" %{ tilix-terminal-session lazygit }
+
+# source other config files
 source "%val{config}/languages.kak"
-
-# ide
-define-command ide %{
-    rename-client main
-    set-option global jumpclient main
-
-    shell
-    lazygit
-
-    focus main
-}
+source "%val{config}/tilix.kak"
 
 # --- plugins ---
 # kak-bundle (plugin manager)
@@ -130,6 +135,7 @@ hook global WinSetOption filetype=(javascript|typescript|c|cpp|python|go) %{
     hook window -always BufOpenFifo '\*diagnostics\*' %{ map window normal <minus> ':lsp-find-error<ret>' }
 
     map window normal -docstring 'open lsp hover' = ':lsp-hover<ret>'
+    map window normal -docstring 'open lsp code actions' <a-=> ':lsp-code-actions<ret>'
 
     lsp-auto-hover-insert-mode-enable
     lsp-inlay-diagnostics-enable window
@@ -156,13 +162,18 @@ map global normal <c-w> ':buffer-switch-index 1<ret>'
 map global normal <c-e> ':buffer-switch-index 2<ret>'
 map global normal <c-r> ':buffer-switch-index 3<ret>'
 
-## auto-pairs
+# auto-pairs
 bundle auto-pairs.kak "https://github.com/alexherbo2/auto-pairs.kak" %{
     enable-auto-pairs
 }
 
 # lf (file manager)
-bundle kak-lf 'https://github.com/haukkagu/kak-lf'
+bundle kakoune-lf 'https://github.com/TeddyDD/kakoune-lf' %{
+    define-command -hidden -override lf-spawn-new %{
+        lf-set-start-dir
+        terminal-down sh -c "env kak_session=%val{session} kak_client=%val{client} lf -command '&echo eval -client $kak_client set-option global lf_id $id | kak -p $kak_session' ""%opt{lf_start_dir}"""
+    }
+}
 map global user -docstring 'open lf' e ':lf<ret>'
 
 # smarttab
@@ -171,6 +182,15 @@ bundle smarttab.kak "https://github.com/andreyorst/smarttab.kak" %{
     hook global WinSetOption filetype=(sh|kak|zig|javascript|typescript|css|html|yaml|meson) expandtab
     hook global WinSetOption filetype=(python|c|cpp) smarttab
 }
+
+# one.kak
+bundle-noload one.kak https://github.com/raiguard/one.kak %{
+} %{
+  # Post-install code here...
+  mkdir -p ${kak_config}/colors
+  ln -sf "${kak_opt_bundle_path}/one.kak" "${kak_config}/colors/"
+}
+colorscheme one-darker
 
 # Source a local project kak config if it exists
 define-command config -docstring "open local config" %{ edit .local.kak }

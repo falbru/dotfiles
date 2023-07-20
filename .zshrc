@@ -18,7 +18,7 @@ zstyle ':vcs_info:git:*' actionformats '(%b|%a%u%c) '
 
 # Enable colors and setup prompt
 autoload -U colors && colors
-PROMPT='%B%1~%b %F{red}${vcs_info_msg_0_}%F{green}❯%f '
+PROMPT='%B${HOSTNAME:+[%m] }%1~%b %F{red}${vcs_info_msg_0_}%F{green}❯%f '
 
 # Auto/tab completion
 autoload -U compinit
@@ -36,7 +36,7 @@ bindkey -M menuselect 'l' vi-forward-char
 source "$HOME/.config/zsh/aliases.zsh"
 
 # Load plugins
-source "$HOME/.config/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.plugin.zsh"
-source "$HOME/.config/zsh/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh"
-source "/usr/share/fzf/shell/key-bindings.zsh"
+source "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.plugin.zsh"
+source "/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh"
+source "/usr/share/fzf/key-bindings.zsh"
 eval "$(zoxide init zsh)"

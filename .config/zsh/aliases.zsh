@@ -24,6 +24,17 @@ alias \
     l.='exa -d .*' \
     cat='bat -pp'
 
+# pacman
+alias \
+    yu='yay -Syu' \
+    yi='yay -S' \
+    ys='yay -Ss' \
+    yr='yay -Rs'
+
+# Distrobox
+alias \
+    ubuntu='distrobox enter ubuntu'
+
 # Git
 function git_current_branch() {
     git rev-parse --abbrev-ref HEAD
