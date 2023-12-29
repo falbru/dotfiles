@@ -1,13 +1,13 @@
 if type -q eza
-    alias ls="eza"
+    alias ls='eza'
 end
 
-alias ll="ls -l"
-alias la="ll -a"
+alias ll='ls -l'
+alias la='ll -a'
 
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-alias e="$EDITOR"
-alias o="xdg-open"
+alias e='$EDITOR'
+alias o='xdg-open'
 
 # git
 function git_current_branch
