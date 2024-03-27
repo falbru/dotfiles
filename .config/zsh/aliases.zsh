@@ -1,10 +1,19 @@
 # Abbreviations
 alias \
-    dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME' \
     ..="cd .." \
+    ..="cd .." \
+    ...="cd ../.." \
+    ....="cd ../../.." \
+    .....="cd ../../../.." \
     e="$EDITOR" \
     o="xdg-open" \
-    h="history"
+    h="history" \
+    ls='eza' \
+    la='eza -a' \
+    ll='eza -l' \
+    l.='eza -d .*' \
+    lS='eza -al --sort=size' \
+    lt='eza -al --sort=modified'
 
 # Add common arguments to commands by default
 alias \
@@ -13,27 +22,8 @@ alias \
     rm="rm -vI" \
     mkdir="mkdir -pv" \
     grep="grep --color=auto" \
-    egrep="egrep --color=auto" \
-    fgrep="fgrep --color=auto"
-
-# Replace commands with modern alternatives
-alias \
-    ls='exa' \
-    la='exa -a' \
-    ll='exa -al' \
-    l.='exa -d .*' \
-    cat='bat -pp'
-
-# pacman
-alias \
-    yu='yay -Syu' \
-    yi='yay -S' \
-    ys='yay -Ss' \
-    yr='yay -Rs'
-
-# Distrobox
-alias \
-    ubuntu='distrobox enter ubuntu'
+    egrep="grep -E --color=auto" \
+    fgrep="grep -F --color=auto"
 
 # Git
 function git_current_branch() {
@@ -71,4 +61,13 @@ alias \
     gcb='git checkout -b' \
     glg='git log --stat' \
     gd='git diff' \
-    gdca='git diff --cached'
+    gdca='git diff --cached' \
+    grb='git rebase' \
+    grbm='git rebase $(git_main_branch)' \
+    grba='git rebase --abort' \
+    grbc='git rebase --continue' \
+    gm='git merge' \
+    gma='git merge --abort' \
+    gsta='git stash' \
+    gstaa='git merge --apply' \
+    gclean='git clean -id'
