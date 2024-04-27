@@ -1,5 +1,9 @@
 # haukkagu's kakoune config
 
+# editorconfig
+hook global BufOpenFile .* %{ editorconfig-load }
+hook global BufNewFile .* %{ editorconfig-load }
+
 # misc
 set-option global grepcmd 'rg --column'
 set-option global autoreload yes
@@ -13,9 +17,7 @@ set-option global modelinefmt '%val{bufname} {comment}%sh{ [ -n "$kak_opt_filety
 set-face global CurSearch +u
 hook global RegisterModified '/' %{ add-highlighter -override global/search regex "%reg{/}" 0:CurSearch }
 
-# tab/indent width
-set-option global tabstop 4
-set-option global indentwidth %opt{tabstop}
+map global normal <esc> ':set-register slash ""<ret>'
 
 # number lines
 add-highlighter global/ show-matching
@@ -43,7 +45,10 @@ hook global InsertChar k %{ try %{
   exec <esc>
 }}
 
-# basic mappings
+# aliases
+alias global s insert-snippet
+
+# mappings
 map global normal '#' ':comment-line<ret>'
 map global insert <c-w> '<esc>bdi'
 map global user -docstring 'delete buffer' x ':delete-buffer<ret>'
@@ -56,35 +61,25 @@ map global normal å '['
 map global normal Å '{'
 
 map global user -docstring 'grep' g ':grep '
-hook global -always BufOpenFifo '\*grep\*' %{ map global normal <minus> ': grep-next-match<ret>' }
+hook global -always BufOpenFifo '\*grep\*' %{
+    map global normal <minus> ':grep-next-match<ret>'
+    map global normal <a-minus> ':grep-previous-match<ret>'
+}
+
+map -docstring "xml tag objet" global object t %{c<lt>([\w.]+)\b[^>]*?(?<lt>!/)>,<lt>/([\w.]+)\b[^>]*?(?<lt>!/)><ret>}
 
 # enable <tab>/<s-tab> for insert completion selection
 hook global InsertCompletionShow .* %{ map window insert <tab> <c-n>; map window insert <s-tab> <c-p> }
 hook global InsertCompletionHide .* %{ unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p> }
 
-# clipboard
-evaluate-commands %sh{
-    if [ -n "$SSH_TTY" ]; then
-        copy='printf "\033]52;;%s\033\\" $(base64 | tr -d "\n") > $( [ -n "$kak_client_pid" ] && echo /proc/$kak_client_pid/fd/0 || echo /dev/tty )'
-        paste='printf "paste unsupported through ssh"'
-        backend="OSC 52"
-    else
-        case $(uname) in
-            Linux)
-                if [ -n "$WAYLAND_DISPLAY" ]; then
-                    copy="wl-copy"; paste="wl-paste"; backend=Wayland
-                else
-                    copy="xclip -i -selection clipboard"; paste="xclip -o -selection clipboard"; backend=X11
-                fi
-                ;;
-            Darwin)  copy="pbcopy"; paste="pbpaste"; backend=OSX ;;
-        esac
-    fi
-    printf "map global user -docstring 'paste (after) from clipboard' p '<a-!>%s<ret>'\n" "$paste"
-    printf "map global user -docstring 'paste (before) from clipboard' P '!%s<ret>'\n" "$paste"
-    printf "map global user -docstring 'yank to primary' y '<a-|>%s<ret>:echo -markup %%{{Information}copied selection to %s clipboard}<ret>'\n" "$copy" "$backend"
-    printf "map global user -docstring 'replace from clipboard' R '|%s<ret>'\n" "$paste"
-}
+# project management
+define-command -params 1 open-project %{ evaluate-commands %sh{
+    printf %s\\n "cd $(ghq root)/$1"
+    printf %s\\n "try %{ source .local.kak }"
+}}
+complete-command open-project shell-script-candidates %{ ghq list }
+
+alias global op open-project
 
 # git gutter
 hook global WinCreate .* %{ evaluate-commands %sh{
@@ -96,40 +91,33 @@ hook global WinCreate .* %{ evaluate-commands %sh{
 }}
 
 # find file
-define-command find -docstring "find files" -params 1 %{ edit %arg{1} }
-complete-command find shell-script-candidates %{ fd -t f -c never }
 map global user -docstring 'find file' f ':find '
 
-# tools
-define-command shell -docstring "open shell in new terminal" %{ terminal zsh }
-define-command lazygit -docstring "open lazygit in new terminal" %{ tilix-terminal-session lazygit }
-
 # source other config files
-source "%val{config}/languages.kak"
-source "%val{config}/tilix.kak"
+source "%val{config}/kakqt.kak"
+try %{
+    require-module kakouneqt
+}
 
-# --- plugins ---
-# kak-bundle (plugin manager)
+source "%val{config}/inactive_client_indicators.kak"
+add_inactive_client_indicators
+
+# plugins
 source "%val{config}/bundle/kak-bundle/rc/kak-bundle.kak"
 bundle-noload kak-bundle https://git.sr.ht/~jdugan6240/kak-bundle
+
+# auto-pairs
+bundle auto-pairs.kak "https://github.com/alexherbo2/auto-pairs.kak" %{
+    enable-auto-pairs
+}
+
+# kak-ansi
+bundle kak-ansi https://github.com/eraserhd/kak-ansi
 
 # kak-lsp
 eval %sh{kak-lsp --kakoune -s $kak_session}
 
 hook global WinSetOption filetype=(javascript|typescript|c|cpp|python|go) %{
-    set-option global lsp_diagnostic_line_error_sign ' '
-    set-option global lsp_diagnostic_line_warning_sign ' '
-    set-option global lsp_diagnostic_line_info_sign ' '
-    set-option global lsp_diagnostic_line_hint_sign ' '
-    set-face global DiagnosticError red+u
-    set-face global DiagnosticWarning yellow+u
-    set-face global DiagnosticHint blue+u
-    set-face global DiagnosticInfo cyan+u
-    set-face global LineFlagError red
-    set-face global LineFlagWarning yellow
-    set-face global LineFlagHint blue
-    set-face global LineFlagInfo cyan
-
     map window user -docstring 'enter lsp mode' l ':enter-user-mode lsp<ret>'
     map window user -docstring 'open lsp diagnostics buffer' d ':lsp-diagnostics<ret>'
     hook window -always BufOpenFifo '\*diagnostics\*' %{ map window normal <minus> ':lsp-find-error<ret>' }
@@ -138,11 +126,11 @@ hook global WinSetOption filetype=(javascript|typescript|c|cpp|python|go) %{
     map window normal -docstring 'open lsp code actions' <a-=> ':lsp-code-actions<ret>'
 
     lsp-auto-hover-insert-mode-enable
-    lsp-inlay-diagnostics-enable window
+    lsp-inlay-diagnostics-enable buffer
     lsp-enable-window
 }
 
-# buffer-switcher
+# kakoune-buffer-switcher
 bundle kakoune-buffer-switcher "https://github.com/occivink/kakoune-buffer-switcher"
 map global user -docstring 'open buffer switcher' b ':buffer-switcher<ret>'
 
@@ -162,34 +150,17 @@ map global normal <c-w> ':buffer-switch-index 1<ret>'
 map global normal <c-e> ':buffer-switch-index 2<ret>'
 map global normal <c-r> ':buffer-switch-index 3<ret>'
 
-# auto-pairs
-bundle auto-pairs.kak "https://github.com/alexherbo2/auto-pairs.kak" %{
-    enable-auto-pairs
-}
+# kakoune-filetree
+bundle kakoune-filetree https://github.com/occivink/kakoune-filetree
 
-# lf (file manager)
-bundle kakoune-lf 'https://github.com/TeddyDD/kakoune-lf' %{
-    define-command -hidden -override lf-spawn-new %{
-        lf-set-start-dir
-        terminal-down sh -c "env kak_session=%val{session} kak_client=%val{client} lf -command '&echo eval -client $kak_client set-option global lf_id $id | kak -p $kak_session' ""%opt{lf_start_dir}"""
-    }
-}
-map global user -docstring 'open lf' e ':lf<ret>'
-
-# smarttab
+# smarttab.kak
 bundle smarttab.kak "https://github.com/andreyorst/smarttab.kak" %{
     hook global ModuleLoaded smarttab %{ hook global WinSetOption filetype=.* %{ set-option buffer softtabstop %opt{tabstop} } }
-    hook global WinSetOption filetype=(sh|kak|zig|javascript|typescript|css|html|yaml|meson) expandtab
-    hook global WinSetOption filetype=(python|c|cpp) smarttab
+    hook global WinSetOption filetype=(sh|kak|zig|javascript|typescript|css|html|yaml|meson|c|cpp) expandtab
+    hook global WinSetOption filetype=(python) smarttab
 }
 
-# one.kak
-bundle-noload one.kak https://github.com/raiguard/one.kak %{
-} %{
-  # Post-install code here...
-  mkdir -p ${kak_config}/colors
-  ln -sf "${kak_opt_bundle_path}/one.kak" "${kak_config}/colors/"
-}
+
 colorscheme one-darker
 
 # Source a local project kak config if it exists

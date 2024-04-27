@@ -1,16 +1,14 @@
 [user]
 	email = falk.bruskeland@gmail.com
 	name = falbru
-
 [core]
 	editor = kak
 	pager = less -FRX
-
 [merge]
 	ff = false
-
 [rerere]
 	enabled = true
-
 [branch]
 	sort = -committerdate
+[pull]
+	rebase = true

@@ -5,6 +5,9 @@ SAVEHIST=10000
 setopt sharehistory
 setopt extendedhistory
 
+# Set terminal title to working directory
+precmd () {print -Pn "\e]0;%~\a"}
+
 # Setup git prompt (code shamelessly stolen from https://salferrarello.com/zsh-git-status-prompt/)
 autoload -Uz add-zsh-hook vcs_info
 setopt prompt_subst
@@ -32,9 +35,15 @@ bindkey -M menuselect 'j' vi-down-line-or-history
 bindkey -M menuselect 'k' vi-up-line-or-history
 bindkey -M menuselect 'l' vi-forward-char
 
+# Edit command line with editor
+autoload -z edit-command-line
+zle -N edit-command-line
+bindkey "^X^E" edit-command-line
+
 # Load external config files
 source "$HOME/.config/zsh/functions.zsh"
 source "$HOME/.config/zsh/aliases.zsh"
+source "$HOME/.config/zsh/tools.zsh"
 
 # Load plugins
 eval "$(zoxide init zsh)"
