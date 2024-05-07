@@ -1,1 +1,1 @@
-/usr/share/kak/rc/tools/doc.asciidoc
+/usr/local/share/kak/rc/tools/doc.asciidoc

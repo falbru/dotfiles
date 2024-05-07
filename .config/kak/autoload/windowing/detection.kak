@@ -1,1 +1,1 @@
-/usr/share/kak/autoload/windowing/detection.kak
+/usr/local/share/kak/rc/windowing/detection.kak

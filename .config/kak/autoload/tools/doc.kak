@@ -1,1 +1,1 @@
-/usr/share/kak/rc/tools/doc.kak
+/usr/local/share/kak/rc/tools/doc.kak

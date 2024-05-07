@@ -1,1 +1,1 @@
-/usr/share/kak/autoload/windowing/new-client.kak
+/usr/local/share/kak/rc/windowing/new-client.kak

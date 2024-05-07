@@ -1,1 +1,1 @@
-/usr/share/kak/autoload/windowing/screen.kak
+/usr/local/share/kak/rc/windowing/screen.kak

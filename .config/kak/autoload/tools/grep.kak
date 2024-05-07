@@ -1,1 +1,1 @@
-/usr/share/kak/rc/tools/grep.kak
+/usr/local/share/kak/rc/tools/grep.kak

@@ -1,1 +1,1 @@
-/usr/share/kak/autoload/windowing/kitty.kak
+/usr/local/share/kak/rc/windowing/kitty.kak

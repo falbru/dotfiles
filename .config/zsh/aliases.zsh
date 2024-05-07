@@ -23,7 +23,8 @@ alias \
     mkdir="mkdir -pv" \
     grep="grep --color=auto" \
     egrep="grep -E --color=auto" \
-    fgrep="grep -F --color=auto"
+    fgrep="grep -F --color=auto" \
+    fd="fdfind"
 
 # Git
 function git_current_branch() {

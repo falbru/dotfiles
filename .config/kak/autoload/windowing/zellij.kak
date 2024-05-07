@@ -1,1 +1,1 @@
-/usr/share/kak/autoload/windowing/zellij.kak
+/usr/local/share/kak/rc/windowing/zellij.kak

@@ -1,1 +1,1 @@
-/usr/share/kak/autoload/windowing/wayland.kak
+/usr/local/share/kak/rc/windowing/wayland.kak

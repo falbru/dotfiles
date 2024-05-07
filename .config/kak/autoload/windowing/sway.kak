@@ -1,1 +1,1 @@
-/usr/share/kak/autoload/windowing/sway.kak
+/usr/local/share/kak/rc/windowing/sway.kak

@@ -1,1 +1,1 @@
-/usr/share/kak/rc/tools/autowrap.kak
+/usr/local/share/kak/rc/tools/autowrap.kak

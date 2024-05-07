@@ -1,1 +1,1 @@
-/usr/share/kak/autoload/windowing/iterm.kak
+/usr/local/share/kak/rc/windowing/iterm.kak

@@ -1,1 +1,1 @@
-/usr/share/kak/rc/tools/comment.kak
+/usr/local/share/kak/rc/tools/comment.kak

@@ -1,1 +1,1 @@
-/usr/share/kak/rc/tools/man.kak
+/usr/local/share/kak/rc/tools/man.kak

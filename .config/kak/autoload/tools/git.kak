@@ -1,1 +1,1 @@
-/usr/share/kak/rc/tools/git.kak
+/usr/local/share/kak/rc/tools/git.kak

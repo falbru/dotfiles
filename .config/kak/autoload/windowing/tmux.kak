@@ -1,1 +1,1 @@
-/usr/share/kak/autoload/windowing/tmux.kak
+/usr/local/share/kak/rc/windowing/tmux.kak

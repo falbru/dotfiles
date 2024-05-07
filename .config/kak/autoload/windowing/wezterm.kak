@@ -1,1 +1,1 @@
-/usr/share/kak/autoload/windowing/wezterm.kak
+/usr/local/share/kak/rc/windowing/wezterm.kak
