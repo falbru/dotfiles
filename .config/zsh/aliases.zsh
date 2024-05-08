@@ -6,6 +6,7 @@ alias \
     ....="cd ../../.." \
     .....="cd ../../../.." \
     e="$EDITOR" \
+    k="kak-qt" \
     o="xdg-open" \
     h="history" \
     ls='eza' \
@@ -13,7 +14,10 @@ alias \
     ll='eza -l' \
     l.='eza -d .*' \
     lS='eza -al --sort=size' \
-    lt='eza -al --sort=modified'
+    lt='eza -al --sort=modified' \
+    fd="fdfind" \
+    p='ghq_fzf_cd' \
+    get='ghq_get_and_cd'
 
 # Add common arguments to commands by default
 alias \
@@ -23,8 +27,7 @@ alias \
     mkdir="mkdir -pv" \
     grep="grep --color=auto" \
     egrep="grep -E --color=auto" \
-    fgrep="grep -F --color=auto" \
-    fd="fdfind"
+    fgrep="grep -F --color=auto"
 
 # Git
 function git_current_branch() {
@@ -50,8 +53,8 @@ alias \
     gst='git status' \
     ga='git add' \
     gaa='git add --all' \
-    gc='git commit -v' \
-    gc!='git commit -v --amend' \
+    gc='git commit -S -v' \
+    gc!='git commit -S -v --amend' \
     gl='git pull' \
     gp='git push' \
     gpf='git push --force-with-lease' \
