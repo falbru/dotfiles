@@ -17,7 +17,10 @@ alias \
     lt='eza -al --sort=modified' \
     fd="fdfind" \
     p='ghq_fzf_cd' \
-    get='ghq_get_and_cd'
+    pnew='ghq_create_and_cd' \
+    pget='ghq_get_and_cd' \
+    aptupg='sudo apt update && sudo apt upgrade' \
+    aptfi='apt_fuzzy_install'
 
 # Add common arguments to commands by default
 alias \

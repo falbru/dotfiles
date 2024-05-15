@@ -1,6 +1,7 @@
 [user]
 	email = falk.bruskeland@gmail.com
 	name = falbru
+	signingkey = 185257D571D77886
 [core]
 	editor = kak
 	pager = less -FRX
@@ -12,3 +13,7 @@
 	sort = -committerdate
 [pull]
 	rebase = true
+[commit]
+	gpgsign = true
+[ghq]
+	user = falbru
