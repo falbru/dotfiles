@@ -56,6 +56,8 @@ alias \
     gst='git status' \
     ga='git add' \
     gaa='git add --all' \
+    grs='git restore' \
+    grst='git restore --staged' \
     gc='git commit -S -v' \
     gc!='git commit -S -v --amend' \
     gl='git pull' \
