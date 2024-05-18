@@ -4,14 +4,14 @@
 hook global BufOpenFile .* %{ editorconfig-load }
 hook global BufNewFile .* %{ editorconfig-load }
 
-# misc
+# options
 set-option global grepcmd 'rg --column'
 set-option global autoreload yes
-set-option global ui_options terminal_assistant=none terminal_status_on_top=true terminal_wheel_scroll_amount=1
+set-option global ui_options 'gui_set_font=Ubuntu Mono 12'
 add-highlighter global/ regex \b(TODO|FIXME|XXX|NOTE)\b 0:default+rb
 
 # statusline
-set-option global modelinefmt '%val{bufname} {comment}%sh{ [ -n "$kak_opt_filetype" ] && printf "($kak_opt_filetype) "}{value}%val{cursor_line}:%val{cursor_char_column} {default}{{context_info}} {{mode_info}} - %val{client}@[%val{session}]'
+set-option global modelinefmt '%val{bufname} {comment}%sh{ [ -n "$kak_opt_filetype" ] && printf "($kak_opt_filetype) "}%val{cursor_line}:%val{cursor_char_column} {default}{{context_info}} {{mode_info}} - %val{client}@[%val{session}]'
 
 # highlighting search results
 set-face global CurSearch +u
@@ -48,10 +48,16 @@ hook global InsertChar k %{ try %{
 # aliases
 alias global s insert-snippet
 
+alias global p ghq-cd
+alias global pnew ghq-create
+alias global pget ghq-get-and-cd
+
 # mappings
 map global normal '#' ':comment-line<ret>'
 map global insert <c-w> '<esc>bdi'
+
 map global user -docstring 'delete buffer' x ':delete-buffer<ret>'
+map global user -docstring 'find file' f ':find '
 
 map global normal æ "'"
 map global normal Æ '"'
@@ -72,15 +78,6 @@ map -docstring "xml tag objet" global object t %{c<lt>([\w.]+)\b[^>]*?(?<lt>!/)>
 hook global InsertCompletionShow .* %{ map window insert <tab> <c-n>; map window insert <s-tab> <c-p> }
 hook global InsertCompletionHide .* %{ unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p> }
 
-# project management
-define-command -params 1 open-project %{ evaluate-commands %sh{
-    printf %s\\n "cd $(ghq root)/$1"
-    printf %s\\n "try %{ source .local.kak }"
-}}
-complete-command open-project shell-script-candidates %{ ghq list }
-
-alias global op open-project
-
 # git gutter
 hook global WinCreate .* %{ evaluate-commands %sh{
     [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ] && printf "%s\n" "
@@ -90,17 +87,26 @@ hook global WinCreate .* %{ evaluate-commands %sh{
         }"
 }}
 
-# find file
-map global user -docstring 'find file' f ':find '
+# format
+hook global BufSetOption filetype=(c|cpp) %{
+    set-option buffer formatcmd 'clang-format'
+}
+
+hook global BufSetOption filetype=(javascript|typescript|json) %{
+    set-option buffer formatcmd "prettier --stdin-filepath=%val{buffile}"
+}
+
+hook global BufSetOption filetype=python %{
+    set-option buffer formatcmd "black -"
+}
+
+
 
 # source other config files
 source "%val{config}/kakqt.kak"
 try %{
     require-module kakouneqt
 }
-
-source "%val{config}/inactive_client_indicators.kak"
-add_inactive_client_indicators
 
 # plugins
 source "%val{config}/bundle/kak-bundle/rc/kak-bundle.kak"
@@ -150,9 +156,6 @@ map global normal <c-w> ':buffer-switch-index 1<ret>'
 map global normal <c-e> ':buffer-switch-index 2<ret>'
 map global normal <c-r> ':buffer-switch-index 3<ret>'
 
-# kakoune-filetree
-bundle kakoune-filetree https://github.com/occivink/kakoune-filetree
-
 # smarttab.kak
 bundle smarttab.kak "https://github.com/andreyorst/smarttab.kak" %{
     hook global ModuleLoaded smarttab %{ hook global WinSetOption filetype=.* %{ set-option buffer softtabstop %opt{tabstop} } }
@@ -160,8 +163,7 @@ bundle smarttab.kak "https://github.com/andreyorst/smarttab.kak" %{
     hook global WinSetOption filetype=(python) smarttab
 }
 
-
-colorscheme one-darker
+colorscheme gruvbox-dark
 
 # Source a local project kak config if it exists
 define-command config -docstring "open local config" %{ edit .local.kak }
