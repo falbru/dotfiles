@@ -77,6 +77,6 @@ alias \
     grbc='git rebase --continue' \
     gm='git merge' \
     gma='git merge --abort' \
-    gsta='git stash' \
-    gstaa='git merge --apply' \
+    gsta='git stash push' \
+    gstaa='git stash apply' \
     gclean='git clean -id'

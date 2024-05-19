@@ -1,30 +1,29 @@
-# haukkagu's kakoune config
+# general
+colorscheme gruvbox-dark
 
-# editorconfig
-hook global BufOpenFile .* %{ editorconfig-load }
-hook global BufNewFile .* %{ editorconfig-load }
-
-# options
 set-option global grepcmd 'rg --column'
 set-option global autoreload yes
 set-option global ui_options 'gui_set_font=Ubuntu Mono 12'
-add-highlighter global/ regex \b(TODO|FIXME|XXX|NOTE)\b 0:default+rb
 
-# statusline
-set-option global modelinefmt '%val{bufname} {comment}%sh{ [ -n "$kak_opt_filetype" ] && printf "($kak_opt_filetype) "}%val{cursor_line}:%val{cursor_char_column} {default}{{context_info}} {{mode_info}} - %val{client}@[%val{session}]'
-
-# highlighting search results
 set-face global CurSearch +u
 hook global RegisterModified '/' %{ add-highlighter -override global/search regex "%reg{/}" 0:CurSearch }
 
-map global normal <esc> ':set-register slash ""<ret>'
+add-highlighter global/ regex \b(TODO|FIXME|XXX|NOTE)\b 0:default+rb
 
-# number lines
 add-highlighter global/ show-matching
 hook global BufCreate .* %[
     add-highlighter buffer/ number-lines -relative -hlcursor
     add-highlighter buffer/ wrap
 ]
+
+git-update-diff-on-write
+
+# statusline
+set-option global modelinefmt '%val{bufname} {comment}%sh{ [ -n "$kak_opt_filetype" ] && printf "($kak_opt_filetype) "}%val{cursor_line}:%val{cursor_char_column} {default}{{context_info}} {{mode_info}} - %val{client}@[%val{session}]'
+
+# enable editorconfig
+hook global BufOpenFile .* %{ editorconfig-load }
+hook global BufNewFile .* %{ editorconfig-load }
 
 # switch cursor color in insert mode
 set-face global InsertCursor black,blue
@@ -39,11 +38,40 @@ hook global ModeChange .*:insert:.* %{ try %{
     unset-face window PrimaryCursorEol
 }}
 
-# jk to escape
+# mappings
+map global insert <c-w> '<esc>bdi'
+
+map global normal '#' ':comment-line<ret>'
+map global normal <esc> ':set-register slash ""<ret>'
+
+map global user -docstring 'delete buffer' x ':delete-buffer<ret>'
+map global user -docstring 'find file' f ':find '
+map global user -docstring 'grep' g ':grep '
+
+map -docstring "xml tag objet" global object t %{c<lt>([\w.]+)\b[^>]*?(?<lt>!/)>,<lt>/([\w.]+)\b[^>]*?(?<lt>!/)><ret>}
+
+hook global -always BufOpenFifo '\*grep\*' %{
+    map global normal <minus> ':grep-next-match<ret>'
+    map global normal <a-minus> ':grep-previous-match<ret>'
+}
+
+hook global InsertCompletionShow .* %{ map window insert <tab> <c-n>; map window insert <s-tab> <c-p> }
+hook global InsertCompletionHide .* %{ unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p> }
+
 hook global InsertChar k %{ try %{
   exec -draft hH <a-k>jk<ret> d
   exec <esc>
 }}
+
+# functions
+define-command ide %{
+    rename-client main
+    set-option global jumpclient main
+
+    set-option global toolsclient clippy
+    set-option global docsclient clippy
+    new %{ rename-client clippy; files }
+}
 
 # aliases
 alias global s insert-snippet
@@ -52,40 +80,7 @@ alias global p ghq-cd
 alias global pnew ghq-create
 alias global pget ghq-get-and-cd
 
-# mappings
-map global normal '#' ':comment-line<ret>'
-map global insert <c-w> '<esc>bdi'
-
-map global user -docstring 'delete buffer' x ':delete-buffer<ret>'
-map global user -docstring 'find file' f ':find '
-
-map global normal æ "'"
-map global normal Æ '"'
-map global normal ø ';'
-map global normal Ø ':'
-map global normal å '['
-map global normal Å '{'
-
-map global user -docstring 'grep' g ':grep '
-hook global -always BufOpenFifo '\*grep\*' %{
-    map global normal <minus> ':grep-next-match<ret>'
-    map global normal <a-minus> ':grep-previous-match<ret>'
-}
-
-map -docstring "xml tag objet" global object t %{c<lt>([\w.]+)\b[^>]*?(?<lt>!/)>,<lt>/([\w.]+)\b[^>]*?(?<lt>!/)><ret>}
-
-# enable <tab>/<s-tab> for insert completion selection
-hook global InsertCompletionShow .* %{ map window insert <tab> <c-n>; map window insert <s-tab> <c-p> }
-hook global InsertCompletionHide .* %{ unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p> }
-
-# git gutter
-hook global WinCreate .* %{ evaluate-commands %sh{
-    [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ] && printf "%s\n" "
-        git show-diff
-        hook window BufWritePost .* %{
-            git update-diff
-        }"
-}}
+alias global files files-new-or-focus
 
 # format
 hook global BufSetOption filetype=(c|cpp) %{
@@ -100,70 +95,14 @@ hook global BufSetOption filetype=python %{
     set-option buffer formatcmd "black -"
 }
 
-
-
 # source other config files
 source "%val{config}/kakqt.kak"
 try %{
     require-module kakouneqt
 }
 
-# plugins
-source "%val{config}/bundle/kak-bundle/rc/kak-bundle.kak"
-bundle-noload kak-bundle https://git.sr.ht/~jdugan6240/kak-bundle
-
-# auto-pairs
-bundle auto-pairs.kak "https://github.com/alexherbo2/auto-pairs.kak" %{
-    enable-auto-pairs
-}
-
-# kak-ansi
-bundle kak-ansi https://github.com/eraserhd/kak-ansi
-
-# kak-lsp
-eval %sh{kak-lsp --kakoune -s $kak_session}
-
-hook global WinSetOption filetype=(javascript|typescript|c|cpp|python|go) %{
-    map window user -docstring 'enter lsp mode' l ':enter-user-mode lsp<ret>'
-    map window user -docstring 'open lsp diagnostics buffer' d ':lsp-diagnostics<ret>'
-    hook window -always BufOpenFifo '\*diagnostics\*' %{ map window normal <minus> ':lsp-find-error<ret>' }
-
-    map window normal -docstring 'open lsp hover' = ':lsp-hover<ret>'
-    map window normal -docstring 'open lsp code actions' <a-=> ':lsp-code-actions<ret>'
-
-    lsp-auto-hover-insert-mode-enable
-    lsp-inlay-diagnostics-enable buffer
-    lsp-enable-window
-}
-
-# kakoune-buffer-switcher
-bundle kakoune-buffer-switcher "https://github.com/occivink/kakoune-buffer-switcher"
-map global user -docstring 'open buffer switcher' b ':buffer-switcher<ret>'
-
-define-command -docstring 'switch to buffer at index' -params 1 buffer-switch-index %{
-    evaluate-commands %sh{
-        non_debug_elements=$(echo "$kak_quoted_buflist" | tr ' ' '\n' | grep -v "\*debug\*" | tr '\n' ' ')
-        selected_element=$(echo "$non_debug_elements" | cut -d "'" -f $(($1*2+2)))
-        if [ -z $selected_element ]; then
-            echo 'echo -markup "{Error}index out of range"'
-        else
-            echo "buffer $selected_element"
-        fi
-    }
-}
-map global normal <c-q> ':buffer-switch-index 0<ret>'
-map global normal <c-w> ':buffer-switch-index 1<ret>'
-map global normal <c-e> ':buffer-switch-index 2<ret>'
-map global normal <c-r> ':buffer-switch-index 3<ret>'
-
-# smarttab.kak
-bundle smarttab.kak "https://github.com/andreyorst/smarttab.kak" %{
-    hook global ModuleLoaded smarttab %{ hook global WinSetOption filetype=.* %{ set-option buffer softtabstop %opt{tabstop} } }
-    hook global WinSetOption filetype=(sh|kak|zig|javascript|typescript|css|html|yaml|meson|c|cpp) expandtab
-    hook global WinSetOption filetype=(python) smarttab
-}
-
-colorscheme gruvbox-dark
+# source plugins
+source "%val{config}/plugins.kak"
 
 # Source a local project kak config if it exists
 define-command config -docstring "open local config" %{ edit .local.kak }

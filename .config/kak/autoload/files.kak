@@ -41,7 +41,7 @@ define-command -override files-unfollow %{
     remove-hooks global files-follow
 }
 
-define-command -override files %{
+define-command -override files-new %{
     evaluate-commands -try-client %opt{toolsclient} %{
         edit -scratch "*files*"
         set-option buffer filetype 'files'
@@ -49,6 +49,15 @@ define-command -override files %{
 
         files-refresh
     }
+}
+
+define-command -override files-new-or-focus %{
+    try %{
+        evaluate-commands -try-client %opt{toolsclient} %{ buffer "*files*" }
+    } catch %{
+        files-new
+    }
+    try %{ kakqt-focus %opt{toolsclient} }
 }
 
 define-command -override files-refresh -params ..1 %{
