@@ -1,9 +1,9 @@
 # general
-colorscheme gruvbox-dark
-
 set-option global grepcmd 'rg --column'
 set-option global autoreload yes
 set-option global ui_options 'gui_set_font=Ubuntu Mono 12'
+
+colorscheme pop-punk
 
 set-face global CurSearch +u
 hook global RegisterModified '/' %{ add-highlighter -override global/search regex "%reg{/}" 0:CurSearch }
@@ -12,14 +12,17 @@ add-highlighter global/ regex \b(TODO|FIXME|XXX|NOTE)\b 0:default+rb
 
 add-highlighter global/ show-matching
 hook global BufCreate .* %[
-    add-highlighter buffer/ number-lines -relative -hlcursor
+    add-highlighter buffer/ number-lines -relative -hlcursor -separator ' '
     add-highlighter buffer/ wrap
 ]
 
 git-update-diff-on-write
 
 # statusline
-set-option global modelinefmt '%val{bufname} {comment}%sh{ [ -n "$kak_opt_filetype" ] && printf "($kak_opt_filetype) "}%val{cursor_line}:%val{cursor_char_column} {default}{{context_info}} {{mode_info}} - %val{client}@[%val{session}]'
+set-option global modelinefmt '%val{bufname} '
+set-option -add global modelinefmt '{comment}%sh{ [ -n "$kak_opt_filetype" ] && printf "($kak_opt_filetype) "}'
+set-option -add global modelinefmt '%val{cursor_line}:%val{cursor_char_column} '
+set-option -add global modelinefmt '{default}{{context_info}} {{mode_info}} - %val{client}'
 
 # enable editorconfig
 hook global BufOpenFile .* %{ editorconfig-load }
@@ -70,13 +73,25 @@ define-command ide %{
 
     set-option global toolsclient clippy
     set-option global docsclient clippy
-    new %{ rename-client clippy; files }
+    new %{ rename-client clippy; files-new }
 }
+
+define-command open-project -params 1 %{
+    ghq-cd %arg{1}
+    evaluate-commands -try-client main %sh{
+        if [ "$kak_client" = "main" ]; then
+            echo "files-new"
+        else
+            echo "ide"
+        fi
+    }
+}
+complete-command open-project shell-script-candidates %{ ghq list }
 
 # aliases
 alias global s insert-snippet
 
-alias global p ghq-cd
+alias global p open-project
 alias global pnew ghq-create
 alias global pget ghq-get-and-cd
 
@@ -95,7 +110,7 @@ hook global BufSetOption filetype=python %{
     set-option buffer formatcmd "black -"
 }
 
-# source other config files
+# source kakqt.kak
 source "%val{config}/kakqt.kak"
 try %{
     require-module kakouneqt
@@ -105,5 +120,5 @@ try %{
 source "%val{config}/plugins.kak"
 
 # Source a local project kak config if it exists
-define-command config -docstring "open local config" %{ edit .local.kak }
+define-command local-config -docstring "edit local config" %{ edit .local.kak }
 try %{ source .local.kak }

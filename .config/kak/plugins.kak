@@ -22,28 +22,11 @@ hook global WinSetOption filetype=(javascript|typescript|c|cpp|python|go) %{
 
     lsp-auto-hover-insert-mode-enable
     lsp-inlay-diagnostics-enable buffer
-    lsp-enable-window
+    lsp-enable
 }
 
-# kakoune-buffer-switcher
-bundle kakoune-buffer-switcher "https://github.com/occivink/kakoune-buffer-switcher"
-map global user -docstring 'open buffer switcher' b ':buffer-switcher<ret>'
-
-define-command -docstring 'switch to buffer at index' -params 1 buffer-switch-index %{
-    evaluate-commands %sh{
-        non_debug_elements=$(echo "$kak_quoted_buflist" | tr ' ' '\n' | grep -v "\*debug\*" | tr '\n' ' ')
-        selected_element=$(echo "$non_debug_elements" | cut -d "'" -f $(($1*2+2)))
-        if [ -z $selected_element ]; then
-            echo 'echo -markup "{Error}index out of range"'
-        else
-            echo "buffer $selected_element"
-        fi
-    }
-}
-map global normal <c-q> ':buffer-switch-index 0<ret>'
-map global normal <c-w> ':buffer-switch-index 1<ret>'
-map global normal <c-e> ':buffer-switch-index 2<ret>'
-map global normal <c-r> ':buffer-switch-index 3<ret>'
+# kak-tree-sitter
+eval %sh{ kak-tree-sitter -dks --session $kak_session --with-text-objects }
 
 # smarttab.kak
 bundle smarttab.kak "https://github.com/andreyorst/smarttab.kak" %{

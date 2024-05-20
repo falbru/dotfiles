@@ -21,4 +21,8 @@ complete-command -menu kakqt-focus client
 
 alias global focus kakqt-focus
 
+hook global SessionRenamed .*:.* %{
+    nop %sh{ KAKQT_SESSION_ID=$kak_client_env_KAKQT_SESSION_ID kak-qt cli rename-session $kak_session }
+}
+
 }
