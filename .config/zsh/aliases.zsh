@@ -20,7 +20,9 @@ alias \
     pnew='ghq_create_and_cd' \
     pget='ghq_get_and_cd' \
     aptupg='sudo apt update && sudo apt upgrade' \
-    aptfi='apt_fuzzy_install'
+    aptfi='apt_fuzzy_install' \
+    itpass='PASSWORD_STORE_DIR=/home/falk/ghq/github.com/itdagene/password-store pass'
+
 
 # Add common arguments to commands by default
 alias \
@@ -30,7 +32,8 @@ alias \
     mkdir="mkdir -pv" \
     grep="grep --color=auto" \
     egrep="grep -E --color=auto" \
-    fgrep="grep -F --color=auto"
+    fgrep="grep -F --color=auto" \
+    lsblk="lsblk -e7"
 
 # Git
 function git_current_branch() {
@@ -72,6 +75,7 @@ alias \
     gd='git diff' \
     gdca='git diff --cached' \
     grb='git rebase' \
+    grbi='git rebase -i' \
     grbm='git rebase $(git_main_branch)' \
     grba='git rebase --abort' \
     grbc='git rebase --continue' \
@@ -79,4 +83,6 @@ alias \
     gma='git merge --abort' \
     gsta='git stash push' \
     gstaa='git stash apply' \
-    gclean='git clean -id'
+    gclean='git clean -id' \
+    grh='git reset' \
+    grhh='git reset --hard'

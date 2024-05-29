@@ -5,8 +5,6 @@
 [core]
 	editor = kak
 	pager = less -FRX
-[merge]
-	ff = false
 [rerere]
 	enabled = true
 [branch]

@@ -13,3 +13,4 @@ load_venv() {
     fi
 }
 add-zsh-hook chpwd load_venv
+load_venv

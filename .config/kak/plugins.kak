@@ -29,8 +29,8 @@ hook global WinSetOption filetype=(javascript|typescript|c|cpp|python|go) %{
 eval %sh{ kak-tree-sitter -dks --session $kak_session --with-text-objects }
 
 # smarttab.kak
-bundle smarttab.kak "https://github.com/andreyorst/smarttab.kak" %{
-    hook global ModuleLoaded smarttab %{ hook global WinSetOption filetype=.* %{ set-option buffer softtabstop %opt{tabstop} } }
-    hook global WinSetOption filetype=(sh|kak|zig|javascript|typescript|css|html|yaml|meson|c|cpp) expandtab
-    hook global WinSetOption filetype=(python) smarttab
-}
+# bundle smarttab.kak "https://github.com/andreyorst/smarttab.kak" %{
+#     hook global ModuleLoaded smarttab %{ hook global WinSetOption filetype=.* %{ set-option buffer softtabstop %opt{tabstop} } }
+#     hook global WinSetOption filetype=(sh|kak|zig|javascript|typescript|css|html|yaml|meson|c|cpp) expandtab
+#     hook global WinSetOption filetype=(python) smarttab
+# }
