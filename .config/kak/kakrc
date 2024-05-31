@@ -47,9 +47,8 @@ map global insert <c-w> '<esc>bdi'
 map global normal '#' ':comment-line<ret>'
 map global normal <esc> ':set-register slash ""<ret>'
 
-map global user -docstring 'delete buffer' x ':delete-buffer<ret>'
 map global user -docstring 'find file' f ':find '
-map global user -docstring 'grep' g ':grep '
+map global user -docstring 'grep' g ':grep ""<c-b>'
 
 map -docstring "xml tag objet" global object t %{c<lt>([\w.]+)\b[^>]*?(?<lt>!/)>,<lt>/([\w.]+)\b[^>]*?(?<lt>!/)><ret>}
 
@@ -115,6 +114,11 @@ alias global pnew ghq-create
 alias global pget ghq-get-and-cd
 
 alias global files files-new-or-focus
+
+alias global g git
+define-command gst "git status" -docstring "git status"
+define-command glg "git log --oneline --decorate --graph" -docstring "git log"
+define-command gd "git diff" -docstring "git diff"
 
 # format
 hook global BufSetOption filetype=(c|cpp) %{

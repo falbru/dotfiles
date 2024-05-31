@@ -138,6 +138,9 @@ define-command -override files-rm -params 1.. %{
         echo "buffer '*files*'"
         cd $kak_opt_files_cwd
         rm $@
+        for buffer in $@; do
+            echo "try %{ delete-buffer $buffer }"
+	    done
         echo "files-refresh -restore"
     }
 }

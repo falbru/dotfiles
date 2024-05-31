@@ -86,9 +86,10 @@ define-command -params 1.. \
         All the optional arguments are forwarded to the git utility
         Available commands:
             add
-            apply      - alias for "patch git apply"
-            blame      - toggle blame annotations
-            blame-jump - show the commit that added the line at cursor
+            apply       - alias for "patch git apply"
+            blame       - toggle blame annotations
+            blame-jump  - show the commit that added the line at cursor
+            object-jump - show the object with the hash at cursor
             checkout
             commit
             diff
@@ -112,6 +113,7 @@ define-command -params 1.. \
             apply \
             blame \
             blame-jump \
+            object-jump \
             checkout \
             commit \
             diff \
@@ -728,6 +730,9 @@ define-command -params 1.. \
             ;;
         blame-jump)
             blame_jump
+            ;;
+        object-jump)
+            echo "exec '<a-i>w: git show %val{selection}<ret>'"
             ;;
         hide-blame)
             hide_blame
