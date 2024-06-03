@@ -19,9 +19,10 @@ alias \
     p='ghq_fzf_cd' \
     pnew='ghq_create_and_cd' \
     pget='ghq_get_and_cd' \
-    aptupg='sudo apt update && sudo apt upgrade' \
+    itpass='PASSWORD_STORE_DIR=/home/falk/ghq/github.com/itdagene/password-store pass' \
     aptfi='apt_fuzzy_install' \
-    itpass='PASSWORD_STORE_DIR=/home/falk/ghq/github.com/itdagene/password-store pass'
+    aptrm='sudo apt remove' \
+    aptupg='sudo apt update && sudo apt upgrade && sudo apt autoremove'
 
 
 # Add common arguments to commands by default
