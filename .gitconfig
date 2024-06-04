@@ -4,7 +4,7 @@
 	signingkey = 185257D571D77886
 [core]
 	editor = kak
-	pager = less -FRX
+	pager = delta
 [rerere]
 	enabled = true
 [branch]

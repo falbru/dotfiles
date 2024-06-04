@@ -22,7 +22,7 @@ hook global WinSetOption filetype=(javascript|typescript|c|cpp|python|go) %{
 
     lsp-auto-hover-insert-mode-enable
     lsp-inlay-diagnostics-enable buffer
-    lsp-enable
+    lsp-enable-window
 }
 
 # kak-tree-sitter

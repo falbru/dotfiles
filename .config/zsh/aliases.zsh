@@ -87,3 +87,6 @@ alias \
     gclean='git clean -id' \
     grh='git reset' \
     grhh='git reset --hard'
+
+# GitHub
+alias ghpr='gh_open_pr_in_browser'
