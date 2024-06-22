@@ -5,6 +5,8 @@ export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
+[ -s "/home/falk/.bun/_bun" ] && source "/home/falk/.bun/_bun"
+
 # autovenv
 autoload -U add-zsh-hook
 load_venv() {

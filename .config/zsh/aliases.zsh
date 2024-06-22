@@ -16,10 +16,11 @@ alias \
     lS='eza -al --sort=size' \
     lt='eza -al --sort=modified' \
     fd="fdfind" \
+    bat="batcat" \
     p='ghq_fzf_cd' \
     pnew='ghq_create_and_cd' \
     pget='ghq_get_and_cd' \
-    itpass='PASSWORD_STORE_DIR=/home/falk/ghq/github.com/itdagene/password-store pass' \
+    itpass='PASSWORD_STORE_DIR=/home/falk/ghq/github.com/itdagene-ntnu/password-store pass' \
     aptfi='apt_fuzzy_install' \
     aptrm='sudo apt remove' \
     aptupg='sudo apt update && sudo apt upgrade && sudo apt autoremove'
@@ -89,4 +90,6 @@ alias \
     grhh='git reset --hard'
 
 # GitHub
-alias ghpr='gh_open_pr_in_browser'
+alias \
+    ghrepo='gh repo view --web 2>/dev/null' \
+    ghpr='gh pr view --web 2>/dev/null'

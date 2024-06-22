@@ -17,6 +17,7 @@ hook global BufCreate .* %[
 ]
 
 git-update-diff-on-write
+add_inactive_client_indicators
 
 # statusline
 set-option global modelinefmt '%val{bufname} '
@@ -66,25 +67,22 @@ hook global InsertChar k %{ try %{
 }}
 
 # functions
-define-command ide %{
-    rename-client main
-    set-option global jumpclient main
-
+define-command clippy %{
+    kakqt-split-vertical %{ rename-client clippy }
     set-option global toolsclient clippy
     set-option global docsclient clippy
-    set-option global filesclient clippy
-    new %{ rename-client clippy; files-new }
+}
+
+define-command ide %{
+    evaluate-commands -try-client client0 %{ rename-client main }
+    set-option global jumpclient main
+
+    clippy
 }
 
 define-command open-project -params 1 %{
+    delete-buffers-matching *
     ghq-cd %arg{1}
-    evaluate-commands -try-client main %sh{
-        if [ "$kak_client" = "main" ]; then
-            echo "files-new"
-        else
-            echo "ide"
-        fi
-    }
 }
 complete-command open-project shell-script-candidates %{ ghq list }
 
@@ -113,12 +111,10 @@ alias global p open-project
 alias global pnew ghq-create
 alias global pget ghq-get-and-cd
 
-alias global files files-new-or-focus
-
 alias global g git
-define-command gst "git status" -docstring "git status"
-define-command glg "git log --oneline --decorate --graph" -docstring "git log"
-define-command gd "git diff" -docstring "git diff"
+define-command gst -params .. "git status %arg{@}" -docstring "git status"
+define-command glg -params .. "git log  %arg{@}--oneline --decorate --graph" -docstring "git log"
+define-command gd -params .. "git diff %arg{@}" -docstring "git diff"
 
 # format
 hook global BufSetOption filetype=(c|cpp) %{

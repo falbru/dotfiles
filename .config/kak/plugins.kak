@@ -25,8 +25,11 @@ hook global WinSetOption filetype=(javascript|typescript|c|cpp|python|go) %{
     lsp-enable-window
 }
 
+# kakoune-lf
+bundle kakoune-lf https://github.com/TeddyDD/kakoune-lf
+
 # kak-tree-sitter
-eval %sh{ kak-tree-sitter -dks --session $kak_session --with-text-objects }
+# eval %sh{ kak-tree-sitter -dks --init $kak_session --with-text-objects }
 
 # smarttab.kak
 # bundle smarttab.kak "https://github.com/andreyorst/smarttab.kak" %{
