@@ -1,6 +1,6 @@
 [user]
 	email = falk.bruskeland@gmail.com
-	name = falbru
+	name = Falk Bruskeland
 	signingkey = 185257D571D77886
 [core]
 	editor = kak
@@ -15,3 +15,7 @@
 	gpgsign = true
 [ghq]
 	user = falbru
+[url " ssh://git@bitbucket.org/"]
+	insteadOf = " https://bitbucket.org/"
+[url "ssh://git@bitbucket.org/"]
+	insteadOf = https://bitbucket.org/

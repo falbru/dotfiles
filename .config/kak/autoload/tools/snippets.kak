@@ -3,5 +3,5 @@ define-command insert-snippet -params 1 %{
 }
 
 complete-command -menu insert-snippet shell-script-candidates %{
-    fd --type file . ~/.config/kak/snippets/ | awk -F '/' '{print $NF}'
+    cd ~/.config/kak/snippets/ && find . -type f | awk -F '/' '{print $NF}'
 }

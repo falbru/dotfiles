@@ -14,23 +14,13 @@ setopt hist_find_no_dups
 bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
 
-# Set terminal title to working directory
-precmd () {print -Pn "\e]0;%~\a"}
+# Setup pure prompt
+fpath+=($HOME/.zsh/pure)
 
-# Setup git prompt (code shamelessly stolen from https://salferrarello.com/zsh-git-status-prompt/)
-autoload -Uz add-zsh-hook vcs_info
-setopt prompt_subst
-add-zsh-hook precmd vcs_info
+autoload -U promptinit; promptinit
+prompt pure
 
-zstyle ':vcs_info:*' check-for-changes true
-zstyle ':vcs_info:*' unstagedstr ' *'
-zstyle ':vcs_info:*' stagedstr ' +'
-zstyle ':vcs_info:git:*' formats       '(%b%u%c) '
-zstyle ':vcs_info:git:*' actionformats '(%b|%a%u%c) '
-
-# Enable colors and setup prompt
-autoload -U colors && colors
-PROMPT='%1~%b %F{red}${vcs_info_msg_0_}%F{green}❯%f '
+zstyle :prompt:pure:prompt:success color green
 
 # Auto/tab completion
 autoload -U compinit

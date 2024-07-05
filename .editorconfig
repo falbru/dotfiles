@@ -11,7 +11,7 @@ insert_final_newline = true
 [*.md]
 trim_trailing_whitespace = false
 
-[Makefile]
+[{Makefile,*.go}]
 indent_style = tab
 
 [*.{json,yml,yaml,xml,ini,toml}]

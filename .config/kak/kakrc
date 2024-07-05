@@ -3,7 +3,7 @@ set-option global grepcmd 'rg --column'
 set-option global autoreload yes
 set-option global ui_options 'gui_set_font=Ubuntu Mono 12'
 
-colorscheme pop-punk
+colorscheme droid3
 
 set-face global CurSearch +u
 hook global RegisterModified '/' %{ add-highlighter -override global/search regex "%reg{/}" 0:CurSearch }
@@ -17,7 +17,7 @@ hook global BufCreate .* %[
 ]
 
 git-update-diff-on-write
-add_inactive_client_indicators
+# add_inactive_client_indicators
 
 # statusline
 set-option global modelinefmt '%val{bufname} '
@@ -28,6 +28,23 @@ set-option -add global modelinefmt '{default}{{context_info}} {{mode_info}} - %v
 # enable editorconfig
 hook global BufOpenFile .* %{ editorconfig-load }
 hook global BufNewFile .* %{ editorconfig-load }
+
+# tabs vs spaces
+hook global BufSetOption indentwidth=[123456789]\d* %{
+    echo -debug hooks
+    remove-hooks buffer tabstospaces
+	hook -group tabstospaces global InsertChar \t %{ try %{
+      execute-keys -draft "h<a-h><a-k>\A\h+\z<ret><a-;>;%opt{indentwidth}@"
+    }}
+
+    hook -group tabstospaces global InsertDelete ' ' %{ try %{
+      execute-keys -draft 'h<a-h><a-k>\A\h+\z<ret>i<space><esc><lt>'
+    }}
+}
+
+hook global BufSetOption indentwidth=0 %{
+    remove-hooks tabstospaces
+}
 
 # switch cursor color in insert mode
 set-face global InsertCursor black,blue
@@ -46,10 +63,12 @@ hook global ModeChange .*:insert:.* %{ try %{
 map global insert <c-w> '<esc>bdi'
 
 map global normal '#' ':comment-line<ret>'
+map global normal '<a-#>' ':comment-block<ret>'
 map global normal <esc> ':set-register slash ""<ret>'
 
 map global user -docstring 'find file' f ':find '
 map global user -docstring 'grep' g ':grep ""<c-b>'
+map global user -docstring 'Rename symbol' r ':lsp-rename-prompt<ret>'
 
 map -docstring "xml tag objet" global object t %{c<lt>([\w.]+)\b[^>]*?(?<lt>!/)>,<lt>/([\w.]+)\b[^>]*?(?<lt>!/)><ret>}
 
@@ -67,17 +86,46 @@ hook global InsertChar k %{ try %{
 }}
 
 # functions
-define-command clippy %{
-    kakqt-split-vertical %{ rename-client clippy }
-    set-option global toolsclient clippy
-    set-option global docsclient clippy
+define-command secondary-client -params .. %{
+    try %{
+        evaluate-commands -client secondary %{ %arg{@} }
+    } catch %{
+        evaluate-commands -try-client main %{
+            new "rename-client secondary; %arg{@}"
+        }
+    }
+}
+complete-command secondary-client command
+
+define-command helper-client -params .. %{
+    try %{
+        evaluate-commands -client helper %{ %arg{@} }
+    } catch %{
+        evaluate-commands -try-client main %{
+            kakqt-split-vertical %{ rename-client helper }
+        }
+    }
+}
+complete-command helper-client command
+
+hook global ClientRenamed .*:helper %{
+    set-option global toolsclient helper
+    set-option global docsclient helper
 }
 
-define-command ide %{
-    evaluate-commands -try-client client0 %{ rename-client main }
-    set-option global jumpclient main
+define-command main-client -params 0..1 %{
+    evaluate-commands %sh{
+        if [ -z "$1" ]; then
+            echo "kakqt-focus main"
+        else
+            echo "evaluate-commands -client '$1' %{ rename-client main }"
+        fi
+    }
+}
+complete-command main-client command
 
-    clippy
+hook global ClientRenamed .*:main %{
+    set global jumpclient 'main'
 }
 
 define-command open-project -params 1 %{
@@ -106,15 +154,20 @@ define-command swap-buffer-with -override -params 1 -client-completion %{
 
 # aliases
 alias global s insert-snippet
+alias global rf recentf
 
 alias global p open-project
 alias global pnew ghq-create
 alias global pget ghq-get-and-cd
 
+alias global sec secondary-client
+alias global helper helper-client
+
 alias global g git
-define-command gst -params .. "git status %arg{@}" -docstring "git status"
-define-command glg -params .. "git log  %arg{@}--oneline --decorate --graph" -docstring "git log"
-define-command gd -params .. "git diff %arg{@}" -docstring "git diff"
+define-command gst -params .. %{ git status %arg{@} } -docstring "git status"
+define-command glg -params ..  %{ git log --oneline --decorate --graph %arg{@} } -docstring "git log"
+define-command gd -params .. %{ git diff %arg{@} } -docstring "git diff"
+define-command gsh -params .. %{ git show %arg{@} } -docstring "git show"
 
 # format
 hook global BufSetOption filetype=(c|cpp) %{
@@ -127,6 +180,10 @@ hook global BufSetOption filetype=(javascript|typescript|json) %{
 
 hook global BufSetOption filetype=python %{
     set-option buffer formatcmd "black -"
+}
+
+hook global BufSetOption filetype=go %{
+    set-option buffer formatcmd "gofmt"
 }
 
 # source kakqt.kak

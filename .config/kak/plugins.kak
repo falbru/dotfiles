@@ -1,5 +1,5 @@
 source "%val{config}/bundle/kak-bundle/rc/kak-bundle.kak"
-bundle-noload kak-bundle https://git.sr.ht/~jdugan6240/kak-bundle
+bundle-noload kak-bundle https://codeberg.org/jdugan6240/kak-bundle
 
 # auto-pairs
 bundle auto-pairs.kak "https://github.com/alexherbo2/auto-pairs.kak" %{
@@ -28,6 +28,25 @@ hook global WinSetOption filetype=(javascript|typescript|c|cpp|python|go) %{
 # kakoune-lf
 bundle kakoune-lf https://github.com/TeddyDD/kakoune-lf
 
+# golang.kak
+bundle golang.kak https://github.com/chriswalker/golang.kak
+
+# kak-harpoon
+bundle kak-harpoon https://github.com/raiguard/kak-harpoon %{
+    harpoon-add-bindings
+}
+
+# kaktree
+bundle kaktree https://git.sr.ht/~teddy/kaktree %{
+    hook global WinSetOption filetype=kaktree %{
+        remove-highlighter buffer/numbers
+        remove-highlighter buffer/matching
+        remove-highlighter buffer/wrap
+        remove-highlighter buffer/show-whitespaces
+    }
+    kaktree-enable
+}
+
 # kak-tree-sitter
 # eval %sh{ kak-tree-sitter -dks --init $kak_session --with-text-objects }
 
@@ -37,3 +56,4 @@ bundle kakoune-lf https://github.com/TeddyDD/kakoune-lf
 #     hook global WinSetOption filetype=(sh|kak|zig|javascript|typescript|css|html|yaml|meson|c|cpp) expandtab
 #     hook global WinSetOption filetype=(python) smarttab
 # }
+#

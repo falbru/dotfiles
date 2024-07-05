@@ -9,6 +9,7 @@ alias \
     k="kak-qt" \
     o="xdg-open" \
     h="history" \
+    c='clear' \
     ls='eza' \
     la='eza -a' \
     ll='eza -l' \
@@ -87,7 +88,8 @@ alias \
     gstaa='git stash apply' \
     gclean='git clean -id' \
     grh='git reset' \
-    grhh='git reset --hard'
+    grhh='git reset --hard' \
+    gsh='git show'
 
 # GitHub
 alias \
