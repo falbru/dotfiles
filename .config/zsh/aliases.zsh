@@ -26,7 +26,6 @@ alias \
     aptrm='sudo apt remove' \
     aptupg='sudo apt update && sudo apt upgrade && sudo apt autoremove'
 
-
 # Add common arguments to commands by default
 alias \
     cp="cp -iv" \
@@ -55,6 +54,20 @@ function git_main_branch() {
   echo master
 }
 
+function git_develop_branch() {
+  command git rev-parse --git-dir &>/dev/null || return
+  local branch
+  for branch in dev devel develop development; do
+    if command git show-ref -q --verify refs/heads/$branch; then
+      echo $branch
+      return 0
+    fi
+  done
+
+  echo develop
+  return 1
+}
+
 alias \
     g='git' \
     ginit='git init' \
@@ -73,13 +86,18 @@ alias \
     gb='git branch' \
     gco='git checkout' \
     gcm='git checkout $(git_main_branch)' \
+    gcd='git checkout $(git_develop_branch)' \
     gcb='git checkout -b' \
+    grl='git reflog' \
     glg='git log --stat' \
     gd='git diff' \
     gdca='git diff --cached' \
+    gdm='git diff $(git_main_branch)..' \
+    gdd='git diff $(git_develop_branch)..' \
     grb='git rebase' \
     grbi='git rebase -i' \
     grbm='git rebase $(git_main_branch)' \
+    grbd='git rebase $(git_develop_branch)' \
     grba='git rebase --abort' \
     grbc='git rebase --continue' \
     gm='git merge' \

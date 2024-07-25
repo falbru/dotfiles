@@ -35,3 +35,21 @@ apt_fuzzy_install() {
   local pkgs=$(apt-cache search --names-only $1 | awk '{print $1}' | fzf --multi --preview 'apt-cache show {}')
   [ ${#pkgs[@]} -gt 0 ] && sudo apt install $pkgs
 }
+
+function fzf_alias() {
+    local selection
+    if selection=$(alias |
+                       sed 's/=/\t/' |
+                       column -s '	' -t |
+                       fzf --query="$BUFFER" |
+                       awk '{ print $1 }'); then
+        BUFFER=$selection
+        CURSOR=$#BUFFER
+    fi
+    zle redisplay
+}
+
+zle -N fzf_alias
+bindkey -M emacs '\ea' fzf_alias
+bindkey -M vicmd '\ea' fzf_alias
+bindkey -M viins '\ea' fzf_alias

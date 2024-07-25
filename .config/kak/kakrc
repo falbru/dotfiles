@@ -3,7 +3,7 @@ set-option global grepcmd 'rg --column'
 set-option global autoreload yes
 set-option global ui_options 'gui_set_font=Ubuntu Mono 12'
 
-colorscheme droid3
+colorscheme one-darker
 
 set-face global CurSearch +u
 hook global RegisterModified '/' %{ add-highlighter -override global/search regex "%reg{/}" 0:CurSearch }
@@ -20,10 +20,10 @@ git-update-diff-on-write
 # add_inactive_client_indicators
 
 # statusline
-set-option global modelinefmt '%val{bufname} '
-set-option -add global modelinefmt '{comment}%sh{ [ -n "$kak_opt_filetype" ] && printf "($kak_opt_filetype) "}'
-set-option -add global modelinefmt '%val{cursor_line}:%val{cursor_char_column} '
-set-option -add global modelinefmt '{default}{{context_info}} {{mode_info}} - %val{client}'
+# set-option global modelinefmt '%val{bufname} '
+# set-option -add global modelinefmt '{comment}%sh{ [ -n "$kak_opt_filetype" ] && printf "($kak_opt_filetype) "}'
+# set-option -add global modelinefmt '%val{cursor_line}:%val{cursor_char_column} '
+# set-option -add global modelinefmt '{default}{{context_info}} {{mode_info}} - %val{client}'
 
 # enable editorconfig
 hook global BufOpenFile .* %{ editorconfig-load }
@@ -61,6 +61,7 @@ hook global ModeChange .*:insert:.* %{ try %{
 
 # mappings
 map global insert <c-w> '<esc>bdi'
+map global insert <c-n> '<a-;>:lsp-snippets-select-next-placeholders<ret>' -docstring 'Select next snippet placeholder'
 
 map global normal '#' ':comment-line<ret>'
 map global normal '<a-#>' ':comment-block<ret>'
@@ -97,6 +98,10 @@ define-command secondary-client -params .. %{
 }
 complete-command secondary-client command
 
+hook global ClientRenamed .*:secondary %{
+    set-option global docsclient secondary
+}
+
 define-command helper-client -params .. %{
     try %{
         evaluate-commands -client helper %{ %arg{@} }
@@ -108,9 +113,31 @@ define-command helper-client -params .. %{
 }
 complete-command helper-client command
 
+define-command toggle-client -params 1 %{
+    evaluate-commands %sh{
+        if KAKQT_SESSION_ID=$kak_client_env_KAKQT_SESSION_ID kak-qt --cli get-visible $1 | grep -q 'true'
+        then
+          echo "kakqt-hide $1"
+        else
+          echo "kakqt-focus $1"
+        fi
+    }
+}
+complete-command toggle-client client
+
 hook global ClientRenamed .*:helper %{
     set-option global toolsclient helper
-    set-option global docsclient helper
+    map global user t ':toggle-client helper<ret>' -docstring 'toggle helper client'
+    hook global WinDisplay '.*' %{
+        evaluate-commands -client helper %{ evaluate-commands %sh{
+            [ "$kak_buffile" = "$kak_hook_param" ] && echo "kakqt-focus helper"
+        }}
+    }
+    hook global BufOpenFifo '.*' %{
+        evaluate-commands -client helper %{ evaluate-commands %sh{
+            [ "$kak_buffile" = "$kak_hook_param" ] && echo "kakqt-focus helper"
+        }}
+    }
 }
 
 define-command main-client -params 0..1 %{
@@ -124,8 +151,20 @@ define-command main-client -params 0..1 %{
 }
 complete-command main-client command
 
+hook -once global ClientCreate client0 %{
+    rename-client main
+}
+
 hook global ClientRenamed .*:main %{
-    set global jumpclient 'main'
+    set-option global jumpclient 'main'
+}
+
+hook global FocusIn main %{
+    set-option global jumpclient 'main'
+}
+hook global FocusIn secondary %{
+    # TODO Should not happen when secondary has opened e.g. *git*, *man* etc.
+    set-option global jumpclient 'secondary'
 }
 
 define-command open-project -params 1 %{
@@ -165,7 +204,7 @@ alias global helper helper-client
 
 alias global g git
 define-command gst -params .. %{ git status %arg{@} } -docstring "git status"
-define-command glg -params ..  %{ git log --oneline --decorate --graph %arg{@} } -docstring "git log"
+define-command glg -params ..  %{ git log %arg{@} } -docstring "git log"
 define-command gd -params .. %{ git diff %arg{@} } -docstring "git diff"
 define-command gsh -params .. %{ git show %arg{@} } -docstring "git show"
 

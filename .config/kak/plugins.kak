@@ -47,13 +47,41 @@ bundle kaktree https://git.sr.ht/~teddy/kaktree %{
     kaktree-enable
 }
 
-# kak-tree-sitter
-# eval %sh{ kak-tree-sitter -dks --init $kak_session --with-text-objects }
+# kakoune-filetree
+bundle kakoune-filetree https://github.com/occivink/kakoune-filetree.git
 
-# smarttab.kak
-# bundle smarttab.kak "https://github.com/andreyorst/smarttab.kak" %{
-#     hook global ModuleLoaded smarttab %{ hook global WinSetOption filetype=.* %{ set-option buffer softtabstop %opt{tabstop} } }
-#     hook global WinSetOption filetype=(sh|kak|zig|javascript|typescript|css|html|yaml|meson|c|cpp) expandtab
-#     hook global WinSetOption filetype=(python) smarttab
-# }
-#
+# kakoune-gdb
+bundle kakoune-gdb https://github.com/occivink/kakoune-gdb
+
+# grep-write.kak
+bundle grep-write https://github.com/jtrv/grep-write.kak
+
+# modeline-extras.kak
+bundle modeline-extras https://github.com/basbebe/modeline-extras.kak %{
+  # set-option global modeline-nerdfont true
+
+  # # enable options
+  # modeline-buffer-position-enable
+  # modeline-git-branch-enable
+  # modeline-indent-enable
+  # modeline-lsp-enable
+
+  # # Git branch + Filename
+  # set-option global modelinefmt '{magenta+i}%opt{modeline_git_branch} {bright-blue+u}%val{bufname}{default}'
+  # # Position
+  # set-option -add global modelinefmt ' %val{cursor_line}:%val{cursor_char_column} %opt{modeline_buffer_position}{default}'
+  # # Context Info + Mode Info
+  # set-option -add global modelinefmt ' {{context_info}} {{mode_info}}'
+  # # lsp
+  # set-option -add global modelinefmt ' {DiagnosticError}%opt{modeline_lsp_err}{DiagnosticWarning}%opt{modeline_lsp_warn}{default}'
+  # # Filetype + Indentwidth
+  # set-option -add global modelinefmt ' %opt{filetype} %opt{modeline_indent}'
+  # # client@session
+  # set-option -add global modelinefmt ' {bright-cyan}%val{client}{bright-cyan+b}%val{session}'
+}
+
+bundle-noload one.kak https://github.com/raiguard/one.kak # Notice, no config block
+bundle-install-hook one.kak %{
+  mkdir -p ${kak_config}/colors
+  ln -sf "${kak_opt_bundle_path}/one.kak" "${kak_config}/colors/"
+}

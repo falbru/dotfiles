@@ -2,7 +2,7 @@ hook global BufOpenFile .* recentf-add-file
 hook global BufWritePost .* recentf-add-file
 
 declare-option str recentf_file "%val{config}/.recentf"
-declare-option int max_recentf_files 150
+declare-option int max_recentf_files 750
 
 define-command -hidden recentf-add-file %{ nop %sh{
     if ! grep -q "${kak_buffile}" "${kak_opt_recentf_file}"; then
