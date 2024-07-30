@@ -10,6 +10,7 @@ alias \
     o="xdg-open" \
     h="history" \
     c='clear' \
+    l='eza -al' \
     ls='eza' \
     la='eza -a' \
     ll='eza -l' \
