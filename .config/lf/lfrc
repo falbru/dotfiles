@@ -87,6 +87,10 @@ cmd on-cd &{{
     fi
     lf -remote "send $id set promptfmt \"$fmt\""
 }}
+cmd on-cd &{{
+    printf "\033]0; $PWD\007" > /dev/tty
+}}
+
 on-cd
 
 cmd git_show ${{

@@ -1,9 +1,9 @@
 # general
 set-option global grepcmd 'rg --column'
 set-option global autoreload yes
-set-option global ui_options 'gui_set_font=Ubuntu Mono 12'
+set-option global ui_options 'kakqt_set_font=MonoLisa 11'
 
-colorscheme one-darker
+colorscheme ok
 
 set-face global CurSearch +u
 hook global RegisterModified '/' %{ add-highlighter -override global/search regex "%reg{/}" 0:CurSearch }
@@ -20,30 +20,33 @@ git-update-diff-on-write
 # add_inactive_client_indicators
 
 # statusline
-# set-option global modelinefmt '%val{bufname} '
-# set-option -add global modelinefmt '{comment}%sh{ [ -n "$kak_opt_filetype" ] && printf "($kak_opt_filetype) "}'
-# set-option -add global modelinefmt '%val{cursor_line}:%val{cursor_char_column} '
-# set-option -add global modelinefmt '{default}{{context_info}} {{mode_info}} - %val{client}'
-
-# enable editorconfig
-hook global BufOpenFile .* %{ editorconfig-load }
-hook global BufNewFile .* %{ editorconfig-load }
-
-# tabs vs spaces
-hook global BufSetOption indentwidth=[123456789]\d* %{
-    echo -debug hooks
-    remove-hooks buffer tabstospaces
-	hook -group tabstospaces global InsertChar \t %{ try %{
-      execute-keys -draft "h<a-h><a-k>\A\h+\z<ret><a-;>;%opt{indentwidth}@"
-    }}
-
-    hook -group tabstospaces global InsertDelete ' ' %{ try %{
-      execute-keys -draft 'h<a-h><a-k>\A\h+\z<ret>i<space><esc><lt>'
-    }}
+declare-option -hidden str modeline_git_branch
+hook global WinDisplay .* %{
+  set-option window modeline_git_branch %sh{
+    branch=$(git -C "${kak_buffile%/*}" rev-parse --abbrev-ref HEAD 2>/dev/null)
+    if [ -n "$branch" ]; then
+      printf "$branch "
+    fi
+  }
 }
 
-hook global BufSetOption indentwidth=0 %{
-    remove-hooks tabstospaces
+set-option global modelinefmt '%val{bufname} %opt{modeline_git_branch}'
+set-option -add global modelinefmt '{comment}%sh{ [ -n "$kak_opt_filetype" ] && printf "($kak_opt_filetype) "}'
+set-option -add global modelinefmt '%val{cursor_line}:%val{cursor_char_column} '
+set-option -add global modelinefmt '{default}{{context_info}} {{mode_info}} - %val{client}'
+
+# enable editorconfig and setup tabs/spaces
+hook global BufOpenFile .* %{
+    editorconfig-load
+    autoconfigtab
+}
+hook global BufNewFile .* %{
+    editorconfig-load
+    autoconfigtab
+}
+
+hook global BufSetOption indentwidth=.* %{
+    set-option buffer softtabstop %opt{indentwidth}
 }
 
 # switch cursor color in insert mode
@@ -60,8 +63,8 @@ hook global ModeChange .*:insert:.* %{ try %{
 }}
 
 # mappings
-map global insert <c-w> '<esc>bdi'
-map global insert <c-n> '<a-;>:lsp-snippets-select-next-placeholders<ret>' -docstring 'Select next snippet placeholder'
+map global insert <c-w> '<a-;>h<a-;>B<a-;>d'
+# map global insert <c-n> '<a-;>:lsp-snippets-select-next-placeholders<ret>' -docstring 'Select next snippet placeholder'
 
 map global normal '#' ':comment-line<ret>'
 map global normal '<a-#>' ':comment-block<ret>'
@@ -69,7 +72,10 @@ map global normal <esc> ':set-register slash ""<ret>'
 
 map global user -docstring 'find file' f ':find '
 map global user -docstring 'grep' g ':grep ""<c-b>'
-map global user -docstring 'Rename symbol' r ':lsp-rename-prompt<ret>'
+map global user -docstring 'Recent buffers list' b ':recent-buffers-pick-link<ret>'
+
+map global normal <c-o> <c-o>vv
+map global normal <c-i> <c-i>vv
 
 map -docstring "xml tag objet" global object t %{c<lt>([\w.]+)\b[^>]*?(?<lt>!/)>,<lt>/([\w.]+)\b[^>]*?(?<lt>!/)><ret>}
 
@@ -82,8 +88,11 @@ hook global InsertCompletionShow .* %{ map window insert <tab> <c-n>; map window
 hook global InsertCompletionHide .* %{ unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p> }
 
 hook global InsertChar k %{ try %{
-  exec -draft hH <a-k>jk<ret> d
-  exec <esc>
+    exec -draft hH <a-k>jk<ret> d
+    exec <esc>
+
+    unset-face window PrimaryCursor
+    unset-face window PrimaryCursorEol
 }}
 
 # functions
@@ -107,7 +116,7 @@ define-command helper-client -params .. %{
         evaluate-commands -client helper %{ %arg{@} }
     } catch %{
         evaluate-commands -try-client main %{
-            kakqt-split-vertical %{ rename-client helper }
+            kakqt-split-vertical %{ rename-client helper; buffer "*debug*" }
         }
     }
 }
@@ -157,6 +166,10 @@ hook -once global ClientCreate client0 %{
 
 hook global ClientRenamed .*:main %{
     set-option global jumpclient 'main'
+    evaluate-commands %sh{
+        [ -z "${kak_client_env_KAKQT_SESSION_ID}" ] || echo "try %{ evaluate-commands -client helper nop } catch %{ helper-client 'kakqt-hide %val{client}; buffer *debug*' }"
+    }
+
 }
 
 hook global FocusIn main %{
@@ -203,10 +216,9 @@ alias global sec secondary-client
 alias global helper helper-client
 
 alias global g git
-define-command gst -params .. %{ git status %arg{@} } -docstring "git status"
-define-command glg -params ..  %{ git log %arg{@} } -docstring "git log"
-define-command gd -params .. %{ git diff %arg{@} } -docstring "git diff"
-define-command gsh -params .. %{ git show %arg{@} } -docstring "git show"
+evaluate-commands %sh{
+    cat .config/zsh/aliases.zsh | grep "g[a-z]*='git .*'" -o | tr -d "'" | awk -F'=' '{print "define-command", $1, "-params .. -docstring \"" $2 "\" %{", $2, "}"}'
+}
 
 # format
 hook global BufSetOption filetype=(c|cpp) %{
@@ -223,12 +235,6 @@ hook global BufSetOption filetype=python %{
 
 hook global BufSetOption filetype=go %{
     set-option buffer formatcmd "gofmt"
-}
-
-# source kakqt.kak
-source "%val{config}/kakoune-qt.kak"
-try %{
-    require-module kakoune-qt
 }
 
 # source plugins

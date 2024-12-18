@@ -1,0 +1,1 @@
+/home/falk/ghq/github.com/falbru/kakoune-qt/rc/kakoune-qt.kak

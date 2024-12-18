@@ -7,7 +7,11 @@ bundle auto-pairs.kak "https://github.com/alexherbo2/auto-pairs.kak" %{
 }
 
 # kak-ansi
-bundle kak-ansi https://github.com/eraserhd/kak-ansi
+bundle kak-ansi https://github.com/eraserhd/kak-ansi %{
+    hook global BufOpenFifo '.*' %{
+        ansi-enable
+    }
+}
 
 # kak-lsp
 eval %sh{kak-lsp --kakoune -s $kak_session}
@@ -27,9 +31,6 @@ hook global WinSetOption filetype=(javascript|typescript|c|cpp|python|go) %{
 
 # kakoune-lf
 bundle kakoune-lf https://github.com/TeddyDD/kakoune-lf
-
-# golang.kak
-bundle golang.kak https://github.com/chriswalker/golang.kak
 
 # kak-harpoon
 bundle kak-harpoon https://github.com/raiguard/kak-harpoon %{
@@ -53,35 +54,26 @@ bundle kakoune-filetree https://github.com/occivink/kakoune-filetree.git
 # kakoune-gdb
 bundle kakoune-gdb https://github.com/occivink/kakoune-gdb
 
+# smarttab.kak
+bundle smarttab.kak https://github.com/andreyorst/smarttab.kak.git
+
 # grep-write.kak
 bundle grep-write https://github.com/jtrv/grep-write.kak
 
-# modeline-extras.kak
-bundle modeline-extras https://github.com/basbebe/modeline-extras.kak %{
-  # set-option global modeline-nerdfont true
-
-  # # enable options
-  # modeline-buffer-position-enable
-  # modeline-git-branch-enable
-  # modeline-indent-enable
-  # modeline-lsp-enable
-
-  # # Git branch + Filename
-  # set-option global modelinefmt '{magenta+i}%opt{modeline_git_branch} {bright-blue+u}%val{bufname}{default}'
-  # # Position
-  # set-option -add global modelinefmt ' %val{cursor_line}:%val{cursor_char_column} %opt{modeline_buffer_position}{default}'
-  # # Context Info + Mode Info
-  # set-option -add global modelinefmt ' {{context_info}} {{mode_info}}'
-  # # lsp
-  # set-option -add global modelinefmt ' {DiagnosticError}%opt{modeline_lsp_err}{DiagnosticWarning}%opt{modeline_lsp_warn}{default}'
-  # # Filetype + Indentwidth
-  # set-option -add global modelinefmt ' %opt{filetype} %opt{modeline_indent}'
-  # # client@session
-  # set-option -add global modelinefmt ' {bright-cyan}%val{client}{bright-cyan+b}%val{session}'
-}
-
-bundle-noload one.kak https://github.com/raiguard/one.kak # Notice, no config block
+bundle-noload one.kak https://github.com/raiguard/one.kak
 bundle-install-hook one.kak %{
   mkdir -p ${kak_config}/colors
   ln -sf "${kak_opt_bundle_path}/one.kak" "${kak_config}/colors/"
+}
+
+bundle-noload kakoune-selenized https://github.com/TeddyDD/kakoune-selenized
+bundle-install-hook kakoune-selenized %{
+  mkdir -p ${kak_config}/colors
+  ln -sf "${kak_opt_bundle_path}/kakoune-selenized" "${kak_config}/colors/"
+}
+
+# kakoune-qt
+hook global ModuleLoaded kakoune-qt %{
+    alias global new kakqt-split-horizontal
+    alias global focus kakqt-focus
 }

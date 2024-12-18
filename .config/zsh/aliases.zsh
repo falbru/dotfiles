@@ -6,7 +6,6 @@ alias \
     ....="cd ../../.." \
     .....="cd ../../../.." \
     e="$EDITOR" \
-    k="kak-qt" \
     o="xdg-open" \
     h="history" \
     c='clear' \
@@ -83,6 +82,7 @@ alias \
     gl='git pull' \
     gp='git push' \
     gpf='git push --force-with-lease' \
+    gpf!='git push --force' \
     gpsup='git push --set-upstream origin $(git_current_branch)' \
     gb='git branch' \
     gco='git checkout' \
@@ -97,6 +97,7 @@ alias \
     gdd='git diff $(git_develop_branch)..' \
     grb='git rebase' \
     grbi='git rebase -i' \
+    grbo='git rebase --onto' \
     grbm='git rebase $(git_main_branch)' \
     grbd='git rebase $(git_develop_branch)' \
     grba='git rebase --abort' \
@@ -108,7 +109,9 @@ alias \
     gclean='git clean -id' \
     grh='git reset' \
     grhh='git reset --hard' \
-    gsh='git show'
+    gsh='git show' \
+    gwip='git add --all && git commit -m WIP' \
+    grwip='git reset HEAD~'
 
 # GitHub
 alias \

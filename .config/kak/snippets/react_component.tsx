@@ -8,3 +8,5 @@ const $1 = ({}: $1Props) => {
     </>
   );
 }
+
+export default $1;
