@@ -2,8 +2,10 @@
 set-option global grepcmd 'rg --column'
 set-option global autoreload yes
 set-option global ui_options 'kakqt_set_font=MonoLisa 11'
+set-option global scrolloff 5,5
 
 colorscheme ok
+colorscheme one-darker
 
 set-face global CurSearch +u
 hook global RegisterModified '/' %{ add-highlighter -override global/search regex "%reg{/}" 0:CurSearch }
@@ -13,7 +15,7 @@ add-highlighter global/ regex \b(TODO|FIXME|XXX|NOTE)\b 0:default+rb
 add-highlighter global/ show-matching
 hook global BufCreate .* %[
     add-highlighter buffer/ number-lines -relative -hlcursor -separator ' '
-    add-highlighter buffer/ wrap
+    add-highlighter buffer/ wrap -indent
 ]
 
 git-update-diff-on-write
@@ -77,12 +79,25 @@ map global user -docstring 'Recent buffers list' b ':recent-buffers-pick-link<re
 map global normal <c-o> <c-o>vv
 map global normal <c-i> <c-i>vv
 
+map global normal J "Jx"
+map global normal K "Kx"
+
+map global normal "<a-*>" "*<percent>s<ret>" -docstring "Select all matching in file"
+
 map -docstring "xml tag objet" global object t %{c<lt>([\w.]+)\b[^>]*?(?<lt>!/)>,<lt>/([\w.]+)\b[^>]*?(?<lt>!/)><ret>}
 
 hook global -always BufOpenFifo '\*grep\*' %{
     map global normal <minus> ':grep-next-match<ret>'
     map global normal <a-minus> ':grep-previous-match<ret>'
 }
+
+map global normal <a-$> ':prompt -shell-completion echo-pipe: %{ echo %sh{ printf "%s" "$kak_selection" | $kak_text }}<ret>'
+
+# Search case-insensitive by default
+map global normal "/" "/(?i)"
+map global normal "?" "?(?i)"
+map global normal "<a-/>" "<a-/>(?i)"
+map global normal "<a-?>" "<a-?>(?i)"
 
 hook global InsertCompletionShow .* %{ map window insert <tab> <c-n>; map window insert <s-tab> <c-p> }
 hook global InsertCompletionHide .* %{ unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p> }

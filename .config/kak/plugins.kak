@@ -16,7 +16,22 @@ bundle kak-ansi https://github.com/eraserhd/kak-ansi %{
 # kak-lsp
 eval %sh{kak-lsp --kakoune -s $kak_session}
 
+# Custom status line
+declare-option -hidden str lsp_modeline_progress ""
+define-command -hidden -params 6 -override lsp-handle-progress %{
+set-option global lsp_modeline_progress %sh{
+  if ! "$6"; then
+    echo "$2${5:+" ($5%)"}${4:+": $4"}"
+  fi
+}
+}
+
 hook global WinSetOption filetype=(javascript|typescript|c|cpp|python|go) %{
+    set-option window lsp_auto_highlight_references true
+    set-option window lsp_hover_max_lines 1000
+    set-option window lsp_hover_anchor true
+    set-option window lsp_snippet_support false
+
     map window user -docstring 'enter lsp mode' l ':enter-user-mode lsp<ret>'
     map window user -docstring 'open lsp diagnostics buffer' d ':lsp-diagnostics<ret>'
     hook window -always BufOpenFifo '\*diagnostics\*' %{ map window normal <minus> ':lsp-find-error<ret>' }
@@ -25,9 +40,25 @@ hook global WinSetOption filetype=(javascript|typescript|c|cpp|python|go) %{
     map window normal -docstring 'open lsp code actions' <a-=> ':lsp-code-actions<ret>'
 
     lsp-auto-hover-insert-mode-enable
-    lsp-inlay-diagnostics-enable buffer
+    lsp-inlay-diagnostics-enable window
     lsp-enable-window
 }
+
+bundle kak-rainbower "https://github.com/crizan/kak-rainbower" %{
+    # TODO doesnt work
+    # set-option global rainbow_mode 0
+    # set-option global rainbow_check_templates Y
+
+    # hook global WinCreate .* %{
+    #   rainbow-enable-window
+    # }
+}
+
+# bundle kakoune-focus "https://github.com/caksoylar/kakoune-focus" %{
+#     map global user <space> ':focus-toggle<ret>' -docstring "toggle selections focus"
+# }
+
+bundle grep-expand.kak https://github.com/jtrv/grep-expand.kak
 
 # kakoune-lf
 bundle kakoune-lf https://github.com/TeddyDD/kakoune-lf
@@ -57,8 +88,11 @@ bundle kakoune-gdb https://github.com/occivink/kakoune-gdb
 # smarttab.kak
 bundle smarttab.kak https://github.com/andreyorst/smarttab.kak.git
 
-# grep-write.kak
-bundle grep-write https://github.com/jtrv/grep-write.kak
+bundle kakoune-grep-write "https://github.com/JacobTravers/kakoune-grep-write" %{
+  hook global WinSetOption filetype=(grep|lsp-goto) %{
+    alias buffer w grep-write
+  }
+}
 
 bundle-noload one.kak https://github.com/raiguard/one.kak
 bundle-install-hook one.kak %{
