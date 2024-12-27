@@ -232,7 +232,7 @@ alias global helper helper-client
 
 alias global g git
 evaluate-commands %sh{
-    cat .config/zsh/aliases.zsh | grep "g[a-z]*='git .*'" -o | tr -d "'" | awk -F'=' '{print "define-command", $1, "-params .. -docstring \"" $2 "\" %{", $2, "}"}'
+    cat ~/.config/zsh/aliases.zsh | grep "g[a-z]*='git .*'" -o | tr -d "'" | awk -F'=' '{print "define-command", $1, "-params .. -docstring \"" $2 "\" %{", $2, "}"}'
 }
 
 # format

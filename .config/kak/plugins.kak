@@ -39,6 +39,13 @@ hook global WinSetOption filetype=(javascript|typescript|c|cpp|python|go) %{
     map window normal -docstring 'open lsp hover' = ':lsp-hover<ret>'
     map window normal -docstring 'open lsp code actions' <a-=> ':lsp-code-actions<ret>'
 
+    map window object a '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
+    map window object <a-a> '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
+    map window object f '<a-semicolon>lsp-object Function Method<ret>' -docstring 'LSP function or method'
+    map window object t '<a-semicolon>lsp-object Class Interface Struct<ret>' -docstring 'LSP class interface or struct'
+    map window object d '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>' -docstring 'LSP errors and warnings'
+    map window object D '<a-semicolon>lsp-diagnostic-object<ret>' -docstring 'LSP errors'
+
     lsp-auto-hover-insert-mode-enable
     lsp-inlay-diagnostics-enable window
     lsp-enable-window
