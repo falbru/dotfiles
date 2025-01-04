@@ -1,1 +1,0 @@
-/usr/local/share/kak/rc/windowing/new-client.kak

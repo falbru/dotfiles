@@ -16,8 +16,6 @@ alias \
     l.='eza -d .*' \
     lS='eza -al --sort=size' \
     lt='eza -al --sort=modified' \
-    fd="fdfind" \
-    bat="batcat" \
     p='ghq_fzf_cd' \
     pnew='ghq_create_and_cd' \
     pget='ghq_get_and_cd' \

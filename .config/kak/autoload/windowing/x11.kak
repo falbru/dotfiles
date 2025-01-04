@@ -1,1 +1,0 @@
-/usr/local/share/kak/rc/windowing/x11.kak

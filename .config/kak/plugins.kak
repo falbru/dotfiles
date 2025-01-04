@@ -14,7 +14,7 @@ bundle kak-ansi https://github.com/eraserhd/kak-ansi %{
 }
 
 # kak-lsp
-eval %sh{kak-lsp --kakoune -s $kak_session}
+eval %sh{kak-lsp}
 
 # Custom status line
 declare-option -hidden str lsp_modeline_progress ""

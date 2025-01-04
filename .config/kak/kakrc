@@ -3,8 +3,8 @@ set-option global grepcmd 'rg --column'
 set-option global autoreload yes
 set-option global ui_options 'kakqt_set_font=MonoLisa 11'
 set-option global scrolloff 5,5
+#set-option global termcmd 'ghostty -e'
 
-colorscheme ok
 colorscheme one-darker
 
 set-face global CurSearch +u
@@ -66,7 +66,6 @@ hook global ModeChange .*:insert:.* %{ try %{
 
 # mappings
 map global insert <c-w> '<a-;>h<a-;>B<a-;>d'
-# map global insert <c-n> '<a-;>:lsp-snippets-select-next-placeholders<ret>' -docstring 'Select next snippet placeholder'
 
 map global normal '#' ':comment-line<ret>'
 map global normal '<a-#>' ':comment-block<ret>'
@@ -93,7 +92,6 @@ hook global -always BufOpenFifo '\*grep\*' %{
 
 map global normal <a-$> ':prompt -shell-completion echo-pipe: %{ echo %sh{ printf "%s" "$kak_selection" | $kak_text }}<ret>'
 
-# Search case-insensitive by default
 map global normal "/" "/(?i)"
 map global normal "?" "?(?i)"
 map global normal "<a-/>" "<a-/>(?i)"
@@ -111,96 +109,6 @@ hook global InsertChar k %{ try %{
 }}
 
 # functions
-define-command secondary-client -params .. %{
-    try %{
-        evaluate-commands -client secondary %{ %arg{@} }
-    } catch %{
-        evaluate-commands -try-client main %{
-            new "rename-client secondary; %arg{@}"
-        }
-    }
-}
-complete-command secondary-client command
-
-hook global ClientRenamed .*:secondary %{
-    set-option global docsclient secondary
-}
-
-define-command helper-client -params .. %{
-    try %{
-        evaluate-commands -client helper %{ %arg{@} }
-    } catch %{
-        evaluate-commands -try-client main %{
-            kakqt-split-vertical %{ rename-client helper; buffer "*debug*" }
-        }
-    }
-}
-complete-command helper-client command
-
-define-command toggle-client -params 1 %{
-    evaluate-commands %sh{
-        if KAKQT_SESSION_ID=$kak_client_env_KAKQT_SESSION_ID kak-qt --cli get-visible $1 | grep -q 'true'
-        then
-          echo "kakqt-hide $1"
-        else
-          echo "kakqt-focus $1"
-        fi
-    }
-}
-complete-command toggle-client client
-
-hook global ClientRenamed .*:helper %{
-    set-option global toolsclient helper
-    map global user t ':toggle-client helper<ret>' -docstring 'toggle helper client'
-    hook global WinDisplay '.*' %{
-        evaluate-commands -client helper %{ evaluate-commands %sh{
-            [ "$kak_buffile" = "$kak_hook_param" ] && echo "kakqt-focus helper"
-        }}
-    }
-    hook global BufOpenFifo '.*' %{
-        evaluate-commands -client helper %{ evaluate-commands %sh{
-            [ "$kak_buffile" = "$kak_hook_param" ] && echo "kakqt-focus helper"
-        }}
-    }
-}
-
-define-command main-client -params 0..1 %{
-    evaluate-commands %sh{
-        if [ -z "$1" ]; then
-            echo "kakqt-focus main"
-        else
-            echo "evaluate-commands -client '$1' %{ rename-client main }"
-        fi
-    }
-}
-complete-command main-client command
-
-hook -once global ClientCreate client0 %{
-    rename-client main
-}
-
-hook global ClientRenamed .*:main %{
-    set-option global jumpclient 'main'
-    evaluate-commands %sh{
-        [ -z "${kak_client_env_KAKQT_SESSION_ID}" ] || echo "try %{ evaluate-commands -client helper nop } catch %{ helper-client 'kakqt-hide %val{client}; buffer *debug*' }"
-    }
-
-}
-
-hook global FocusIn main %{
-    set-option global jumpclient 'main'
-}
-hook global FocusIn secondary %{
-    # TODO Should not happen when secondary has opened e.g. *git*, *man* etc.
-    set-option global jumpclient 'secondary'
-}
-
-define-command open-project -params 1 %{
-    delete-buffers-matching *
-    ghq-cd %arg{1}
-}
-complete-command open-project shell-script-candidates %{ ghq list }
-
 define-command delete-buffers-matching -params 1 %{
     evaluate-commands -buffer * %{
         evaluate-commands %sh{ case "$kak_buffile" in $1) echo "delete-buffer" ;; esac }
@@ -222,13 +130,6 @@ define-command swap-buffer-with -override -params 1 -client-completion %{
 # aliases
 alias global s insert-snippet
 alias global rf recentf
-
-alias global p open-project
-alias global pnew ghq-create
-alias global pget ghq-get-and-cd
-
-alias global sec secondary-client
-alias global helper helper-client
 
 alias global g git
 evaluate-commands %sh{
