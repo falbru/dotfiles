@@ -14,6 +14,12 @@ declare-option str-list ls_args -c %{
 }
 declare-option str ls_working_directory
 
+define-command ls-buffer -params 0 %{
+    evaluate-commands %sh{
+        echo "ls $(dirname $kak_buffile)"
+    }
+}
+
 define-command ls -params 0..1 %{
   evaluate-commands %sh{
     case "$#" in

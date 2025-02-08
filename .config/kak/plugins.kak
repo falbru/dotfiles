@@ -107,6 +107,12 @@ bundle-install-hook one.kak %{
   ln -sf "${kak_opt_bundle_path}/one.kak" "${kak_config}/colors/"
 }
 
+bundle-noload kakoune-mysticaltutor https://github.com/caksoylar/kakoune-mysticaltutor
+bundle-install-hook kakoune-mysticaltutor %{
+  mkdir -p ${kak_config}/colors
+  ln -sf "${kak_opt_bundle_path}/kakoune-mysticaltutor" "${kak_config}/colors/"
+}
+
 bundle-noload kakoune-selenized https://github.com/TeddyDD/kakoune-selenized
 bundle-install-hook kakoune-selenized %{
   mkdir -p ${kak_config}/colors

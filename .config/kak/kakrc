@@ -1,11 +1,13 @@
 # general
 set-option global grepcmd 'rg --column'
+# set-option global termcmd 'ghostty -e'
 set-option global autoreload yes
 set-option global ui_options 'kakqt_set_font=MonoLisa 11'
 set-option global scrolloff 5,5
-#set-option global termcmd 'ghostty -e'
 
-colorscheme one-darker
+hook global -once ModuleLoaded (x11|wayland) %{ set-option global termcmd 'ghostty -e' }
+
+colorscheme mysticaltutor
 
 set-face global CurSearch +u
 hook global RegisterModified '/' %{ add-highlighter -override global/search regex "%reg{/}" 0:CurSearch }
@@ -19,20 +21,48 @@ hook global BufCreate .* %[
 ]
 
 git-update-diff-on-write
-# add_inactive_client_indicators
+add_inactive_client_indicators
 
 # statusline
 declare-option -hidden str modeline_git_branch
+declare-option -hidden str modeline_git_fetch
+
+# TODO update periodically
 hook global WinDisplay .* %{
-  set-option window modeline_git_branch %sh{
-    branch=$(git -C "${kak_buffile%/*}" rev-parse --abbrev-ref HEAD 2>/dev/null)
-    if [ -n "$branch" ]; then
-      printf "$branch "
-    fi
-  }
+    set-option window modeline_git_branch %sh{
+        branch=$(git -C "${kak_buffile%/*}" rev-parse --abbrev-ref HEAD 2>/dev/null)
+        if [ -n "$branch" ]; then
+            if [ ! -z "$(git -C "${kak_buffile%/*}" status --porcelain)" ]; then
+                printf "$branch*"
+            else
+                printf "$branch"
+            fi
+        fi
+    }
+    # TODO set modeline_git_fetch for window-scope
+    # TODO fetch from kak_buffile
+    nop %sh{
+       (
+           command git -c gc.auto=0 fetch \
+               --quiet \
+               --no-tags \
+               --recurse-submodules=no \
+               &>/dev/null || exit 1
+
+           local ahead behind
+           ahead=$(command git rev-list --count @'{u}'..HEAD 2>/dev/null)
+           behind=$(command git rev-list --count HEAD..@'{u}' 2>/dev/null)
+
+           if [ "$ahead" -gt 0 ]; then
+               printf 'set-option global modeline_git_fetch " ⇡"\n' | kak -p "$kak_session"
+           elif [ "$behind" -gt 0 ]; then
+               printf 'set-option global modeline_git_fetch " ⇣"\n' | kak -p "$kak_session"
+           fi
+       ) </dev/null >/dev/null 2>&1 &
+    }
 }
 
-set-option global modelinefmt '%val{bufname} %opt{modeline_git_branch}'
+set-option global modelinefmt '{blue}%val{bufname} {red}[%opt{modeline_git_branch}%opt{modeline_git_fetch}] '
 set-option -add global modelinefmt '{comment}%sh{ [ -n "$kak_opt_filetype" ] && printf "($kak_opt_filetype) "}'
 set-option -add global modelinefmt '%val{cursor_line}:%val{cursor_char_column} '
 set-option -add global modelinefmt '{default}{{context_info}} {{mode_info}} - %val{client}'
@@ -77,9 +107,6 @@ map global user -docstring 'Recent buffers list' b ':recent-buffers-pick-link<re
 
 map global normal <c-o> <c-o>vv
 map global normal <c-i> <c-i>vv
-
-map global normal J "Jx"
-map global normal K "Kx"
 
 map global normal "<a-*>" "*<percent>s<ret>" -docstring "Select all matching in file"
 
