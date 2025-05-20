@@ -1,6 +1,13 @@
-define-command mkdir %{
+define-command mkdir -params .. %{
   evaluate-commands %sh{
-    mkdir -p -- "$(dirname -- "$kak_buffile")" ||
+    if [ $# -gt 0 ]; then
+        dirs="$@"
+    else
+        dirs=$(dirname -- "$kak_buffile")
+    fi
+    mkdir -p -- $dirs ||
     printf "fail 'ERROR: mkdir exited with: %d.'" "$?"
-  }
+    }
 }
+
+complete-command mkdir file

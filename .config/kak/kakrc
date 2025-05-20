@@ -1,13 +1,12 @@
 # general
 set-option global grepcmd 'rg --column'
-# set-option global termcmd 'ghostty -e'
 set-option global autoreload yes
 set-option global ui_options 'kakqt_set_font=MonoLisa 11'
 set-option global scrolloff 5,5
 
 hook global -once ModuleLoaded (x11|wayland) %{ set-option global termcmd 'ghostty -e' }
 
-colorscheme catppuccin
+colorscheme mysticaltutor
 
 set-face global CurSearch +u
 hook global RegisterModified '/' %{ add-highlighter -override global/search regex "%reg{/}" 0:CurSearch }
@@ -78,7 +77,7 @@ map global normal <c-i> <c-i>vv
 
 map global normal "<a-*>" "*<percent>s<ret>" -docstring "Select all matching in file"
 
-map -docstring "xml tag objet" global object t %{c<lt>([\w.]+)\b[^>]*?(?<lt>!/)>,<lt>/([\w.]+)\b[^>]*?(?<lt>!/)><ret>}
+map -docstring "xml tag object" global object x %{c<lt>([\w.]+)\b[^>]*?(?<lt>!/)>,<lt>/([\w.]+)\b[^>]*?(?<lt>!/)><ret>}
 
 hook global -always BufOpenFifo '\*grep\*' %{
     map global normal <minus> ':grep-next-match<ret>'
@@ -123,7 +122,7 @@ define-command swap-buffer-with -override -params 1 -client-completion %{
 }
 
 # aliases
-alias global s insert-snippet
+alias global s snippet-insert
 alias global rf recentf
 
 alias global ga git-add
@@ -149,6 +148,5 @@ hook global BufSetOption filetype=go %{
 # source plugins
 source "%val{config}/plugins.kak"
 
-# Source a local project kak config if it exists
-define-command local-config -docstring "edit local config" %{ edit .local.kak }
+# Source a local kak config if it exists
 try %{ source .local.kak }
