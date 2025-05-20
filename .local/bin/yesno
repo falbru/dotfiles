@@ -1,0 +1,9 @@
+#!/bin/sh
+
+read -r command
+
+echo "Command to execute: $command"
+echo -n "Execute? (y/n): "
+read -r answer < /dev/tty
+
+[[ "$answer" =~ ^[Yy]$ ]] && eval "$command"
