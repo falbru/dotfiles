@@ -16,10 +16,6 @@ alias \
     l.='eza -d .*' \
     lS='eza -al --sort=size' \
     lt='eza -al --sort=modified' \
-    p='ghq_fzf_cd' \
-    pnew='ghq_create_and_cd' \
-    pget='ghq_get_and_cd' \
-    itpass='PASSWORD_STORE_DIR=/home/falk/ghq/github.com/itdagene-ntnu/password-store pass' \
     aptfi='apt_fuzzy_install' \
     aptrm='sudo apt remove' \
     aptupg='sudo apt update && sudo apt upgrade && sudo apt autoremove'
@@ -104,6 +100,10 @@ alias \
     gma='git merge --abort' \
     gsta='git stash push' \
     gstaa='git stash apply' \
+    gsw='git switch' \
+    gswc='git switch -c' \
+    gswm='git switch $(git_main_branch)' \
+    gswd='git switch $(git_develop_branch)' \
     gclean='git clean -id' \
     grh='git reset' \
     grhh='git reset --hard' \

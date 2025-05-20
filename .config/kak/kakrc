@@ -126,10 +126,8 @@ define-command swap-buffer-with -override -params 1 -client-completion %{
 alias global s insert-snippet
 alias global rf recentf
 
-alias global g git
-evaluate-commands %sh{
-    cat ~/.config/zsh/aliases.zsh | grep "g[a-z]*='git .*'" -o | tr -d "'" | awk -F'=' '{print "define-command", $1, "-params .. -docstring \"" $2 "\" %{", $2, "}"}'
-}
+alias global ga git-add
+alias global gsw git-switch
 
 # format
 hook global BufSetOption filetype=(c|cpp) %{

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Flatpak Installer
+Comment=Install .flatpakref files on the system
+Icon=system-software-install
+Terminal=true
+Exec=/usr/bin/flatpak install %f
+Categories=ConsoleOnly;System;
+MimeType=application/vnd.flatpak;application/vnd.flatpak.repo;application/vnd.flatpak.ref;
+NoDisplay=true
+StartupNotify=true
