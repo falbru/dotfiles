@@ -113,5 +113,5 @@ alias \
 
 # GitHub
 alias \
-    ghrepo='gh repo view --web 2>/dev/null' \
-    ghpr='gh pr view --web 2>/dev/null'
+    ghrepo='gh repo view --web >/dev/null' \
+    ghpr='gh pr view --web >/dev/null'
