@@ -19,9 +19,6 @@ hook global BufCreate .* %[
     add-highlighter buffer/ wrap -indent
 ]
 
-git-update-diff-on-write
-add_inactive_client_indicators
-
 # statusline
 hook global WinDisplay .* %{
     modeline-set-git-branch
@@ -34,7 +31,7 @@ set-option -add global modelinefmt '{comment}%sh{ [ -n "$kak_opt_filetype" ] && 
 set-option -add global modelinefmt '%val{cursor_line}:%val{cursor_char_column} '
 set-option -add global modelinefmt '{default}{{context_info}} {{mode_info}} - %val{client}'
 
-# enable editorconfig and setup tabs/spaces
+# enable editorconfig
 hook global BufOpenFile .* %{
     editorconfig-load
     autoconfigtab
@@ -42,10 +39,6 @@ hook global BufOpenFile .* %{
 hook global BufNewFile .* %{
     editorconfig-load
     autoconfigtab
-}
-
-hook global BufSetOption indentwidth=.* %{
-    set-option buffer softtabstop %opt{indentwidth}
 }
 
 # switch cursor color in insert mode
