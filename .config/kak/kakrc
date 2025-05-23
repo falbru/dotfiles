@@ -13,23 +13,23 @@ hook global RegisterModified '/' %{ add-highlighter -override global/search rege
 
 add-highlighter global/ regex \b(TODO|FIXME|XXX|NOTE)\b 0:default+rb
 
-add-highlighter global/ show-matching
+# add-highlighter global/ show-matching
 hook global BufCreate .* %[
     add-highlighter buffer/ number-lines -relative -hlcursor -separator ' '
     add-highlighter buffer/ wrap -indent
 ]
 
-# statusline
-hook global WinDisplay .* %{
-    modeline-set-git-branch
-    modeline-set-git-dirty
-    modeline-set-git-fetch
-}
+# # statusline
+# hook global WinDisplay .* %{
+#     modeline-set-git-branch
+#     modeline-set-git-dirty
+#     modeline-set-git-fetch
+# }
 
-set-option global modelinefmt '{blue}%val{bufname} {red}[%opt{modeline_git_branch}%opt{modeline_git_fetch}] '
-set-option -add global modelinefmt '{comment}%sh{ [ -n "$kak_opt_filetype" ] && printf "($kak_opt_filetype) "}'
-set-option -add global modelinefmt '%val{cursor_line}:%val{cursor_char_column} '
-set-option -add global modelinefmt '{default}{{context_info}} {{mode_info}} - %val{client}'
+# set-option global modelinefmt '{blue}%val{bufname} {red}[%opt{modeline_git_branch}%opt{modeline_git_fetch}] '
+# set-option -add global modelinefmt '{comment}%sh{ [ -n "$kak_opt_filetype" ] && printf "($kak_opt_filetype) "}'
+# set-option -add global modelinefmt '%val{cursor_line}:%val{cursor_char_column} '
+# set-option -add global modelinefmt '{default}{{context_info}} {{mode_info}} - %val{client}'
 
 # enable editorconfig
 hook global BufOpenFile .* %{
