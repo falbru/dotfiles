@@ -2,8 +2,8 @@
 
 ![screenshot of my desktop](./screenshots/desktop.png)
 
-- **OS**: Ubuntu 24.04
-- **DE**: GNOME 46
+- **OS**: Ubuntu 25.04
+- **DE**: GNOME 48
 - **Shell**: zsh
 - **Text Editor**: Kakoune
 
