@@ -1,0 +1,3 @@
+[submodule ".config/kak/autoload/plugins/filetree/filetree"]
+	path = .config/kak/autoload/plugins/filetree/filetree
+	url = git@github.com:falbru/kakoune-filetree

@@ -4,7 +4,7 @@ set-option global autoreload yes
 set-option global ui_options 'kakqt_set_font=MonoLisa 11'
 set-option global scrolloff 5,5
 
-hook global -once ModuleLoaded (x11|wayland) %{ set-option global termcmd 'ghostty -e' }
+hook global -once ModuleLoaded (x11|wayland) %{ set-option global termcmd 'ptyxis -e' }
 
 colorscheme mysticaltutor
 

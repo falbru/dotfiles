@@ -79,19 +79,8 @@ bundle kak-harpoon https://github.com/raiguard/kak-harpoon %{
     harpoon-add-bindings
 }
 
-# kaktree
-bundle kaktree https://git.sr.ht/~teddy/kaktree %{
-    hook global WinSetOption filetype=kaktree %{
-        remove-highlighter buffer/numbers
-        remove-highlighter buffer/matching
-        remove-highlighter buffer/wrap
-        remove-highlighter buffer/show-whitespaces
-    }
-    kaktree-enable
-}
-
 # kakoune-filetree
-bundle kakoune-filetree https://github.com/occivink/kakoune-filetree.git
+# bundle kakoune-filetree https://github.com/occivink/kakoune-filetree.git
 
 # kakoune-gdb
 bundle kakoune-gdb https://github.com/occivink/kakoune-gdb

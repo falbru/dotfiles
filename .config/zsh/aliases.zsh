@@ -16,6 +16,8 @@ alias \
     l.='eza -d .*' \
     lS='eza -al --sort=size' \
     lt='eza -al --sort=modified' \
+    bat='batcat --style=plain' \
+    fd='fdfind' \
     aptfi='apt_fuzzy_install' \
     aptrm='sudo apt remove' \
     aptupg='sudo apt update && sudo apt upgrade && sudo apt autoremove'

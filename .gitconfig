@@ -1,7 +1,7 @@
 [user]
 	email = falk.bruskeland@gmail.com
 	name = Falk Bruskeland
-	signingkey = A64436428430E25D 
+	signingkey = A64436428430E25D
 [core]
 	editor = kak
 	pager = delta
@@ -21,3 +21,5 @@
 	insteadOf = https://bitbucket.org/
 [push]
 	autoSetupRemote = true
+[ghq]
+root = ~/code
