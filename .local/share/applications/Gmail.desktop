@@ -1,0 +1,27 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Gmail
+Comment=Open Gmail in a new browser tab
+Exec=xdg-open https://mail.google.com
+Icon=gmail
+Terminal=false
+Categories=Network;Email;
+StartupNotify=true
+Actions=account1;account2;account3;account4;
+
+[Desktop Action account1]
+Name=Personal Account
+Exec=xdg-open "https://mail.google.com/mail/u/0/"
+
+[Desktop Action account2]
+Name=Abakus.no
+Exec=xdg-open "https://mail.google.com/mail/u/2/"
+
+[Desktop Action account3]
+Name=Samfundet
+Exec=xdg-open "https://mail.google.com/mail/u/3/"
+
+[Desktop Action account4]
+Name=Capra
+Exec=xdg-open "https://mail.google.com/mail/u/4/"
