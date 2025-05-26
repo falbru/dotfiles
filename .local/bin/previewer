@@ -1,0 +1,2 @@
+#!/bin/sh
+batcat --color always -p "$@"

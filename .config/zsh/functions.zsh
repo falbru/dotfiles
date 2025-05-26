@@ -10,7 +10,7 @@ _j_dirs() {
 
 j() {
   local jump_path=$(_j_dirs | grep -i "${1:-.*}"  | sed "s|^$HOME/||" | fzf)
-  [ -z "$jump_path" ] || cd "$HOME/$jump_path"
+  [ -z "$jump_path" ] || { cd "$HOME/$jump_path" && clear }
 }
 
 ghq_get_and_cd() {
