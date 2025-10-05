@@ -5,21 +5,22 @@
 [core]
 	editor = kak
 	pager = delta
+[commit]
+	gpgsign = true
 [rerere]
 	enabled = true
 [branch]
 	sort = -committerdate
 [pull]
 	rebase = true
-[commit]
-	gpgsign = true
-[ghq]
-	user = falbru
-[url " ssh://git@bitbucket.org/"]
-	insteadOf = " https://bitbucket.org/"
-[url "ssh://git@bitbucket.org/"]
-	insteadOf = https://bitbucket.org/
 [push]
 	autoSetupRemote = true
 [ghq]
-root = ~/code
+	root = ~/code
+	user = falbru
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential

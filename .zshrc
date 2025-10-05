@@ -1,3 +1,7 @@
+if [[ -o login ]]; then
+    source /etc/profile.d/vte-2.91.sh
+fi
+
 # History
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
@@ -49,3 +53,11 @@ eval "$(zoxide init zsh)"
 source "/usr/share/doc/fzf/examples/key-bindings.zsh"
 source "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 source "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
+# pnpm
+export PNPM_HOME="/home/falk/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

@@ -2,7 +2,9 @@ type $1Props = {
 
 }
 
-const $1 = ({}: $1Props) => {
+const $1 = (props: $1Props) => {
+  const {} = props;
+
   return (
     <>
     </>

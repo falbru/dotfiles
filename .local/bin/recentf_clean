@@ -1,0 +1,6 @@
+#!/bin/bash
+temp_file=$(mktemp)
+while IFS= read -r filepath; do
+    [[ -e "$filepath" ]] && echo "$filepath"
+done < /home/falk/.config/kak/.recentf > "$temp_file"
+mv "$temp_file" /home/falk/.config/kak/.recentf

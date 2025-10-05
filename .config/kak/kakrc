@@ -1,12 +1,12 @@
 # general
-set-option global grepcmd 'rg --column'
+set-option global grepcmd 'ag --column --nocolor --ignore-dir .git'
 set-option global autoreload yes
-set-option global ui_options 'kakqt_set_font=MonoLisa 11'
+set-option global ui_options 'kakqt_set_font=MonoLisa 10'
 set-option global scrolloff 5,5
 
 hook global -once ModuleLoaded (x11|wayland) %{ set-option global termcmd 'ptyxis -x' }
 
-colorscheme mysticaltutor
+# colorscheme mysticaltutor
 
 set-face global CurSearch +u
 hook global RegisterModified '/' %{ add-highlighter -override global/search regex "%reg{/}" 0:CurSearch }
@@ -15,7 +15,7 @@ add-highlighter global/ regex \b(TODO|FIXME|XXX|NOTE)\b 0:default+rb
 
 # add-highlighter global/ show-matching
 hook global BufCreate .* %[
-    add-highlighter buffer/ number-lines -relative -hlcursor -separator ' '
+    add-highlighter buffer/ number-lines -relative -hlcursor -separator '  '
     add-highlighter buffer/ wrap -indent
 ]
 
@@ -60,10 +60,6 @@ map global insert <c-w> '<a-;>h<a-;>B<a-;>d'
 map global normal '#' ':comment-line<ret>'
 map global normal '<a-#>' ':comment-block<ret>'
 map global normal <esc> ':set-register slash ""<ret>'
-
-map global user -docstring 'find file' f ':find '
-map global user -docstring 'grep' g ':grep ""<c-b>'
-map global user -docstring 'Recent buffers list' b ':recent-buffers-pick-link<ret>'
 
 map global normal <c-o> <c-o>vv
 map global normal <c-i> <c-i>vv
@@ -115,11 +111,15 @@ define-command swap-buffer-with -override -params 1 -client-completion %{
 }
 
 # aliases
+alias global f find
+hook -once global ModuleLoaded grep %{ alias global ag grep }
 alias global s snippet-insert
 alias global rf recentf
+alias global o xdg-open
 
 alias global ga git-add
 alias global gsw git-switch
+alias global gst git-status
 
 # format
 hook global BufSetOption filetype=(c|cpp) %{
@@ -138,8 +138,16 @@ hook global BufSetOption filetype=go %{
     set-option buffer formatcmd "gofmt"
 }
 
+## autoformat
+hook global BufSetOption filetype=go %{
+    hook -group autoformat window BufWritePre .* format
+}
+
 # source plugins
 source "%val{config}/plugins.kak"
 
 # Source a local kak config if it exists
 try %{ source .local.kak }
+
+# Open dashboard
+dashboard

@@ -33,11 +33,10 @@ hook global WinSetOption filetype=(javascript|typescript|c|cpp|python|go) %{
     set-option window lsp_snippet_support false
 
     map window user -docstring 'enter lsp mode' l ':enter-user-mode lsp<ret>'
-    map window user -docstring 'open lsp diagnostics buffer' d ':lsp-diagnostics<ret>'
     hook window -always BufOpenFifo '\*diagnostics\*' %{ map window normal <minus> ':lsp-find-error<ret>' }
 
-    map window normal -docstring 'open lsp hover' = ':lsp-hover<ret>'
-    map window normal -docstring 'open lsp code actions' <a-=> ':lsp-code-actions<ret>'
+    map window user -docstring 'open lsp hover' <space> ':lsp-hover<ret>'
+    map window user -docstring 'open lsp code actions' <s-space> ':lsp-code-actions<ret>'
 
     # map window object a '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
     # map window object <a-a> '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
@@ -112,6 +111,10 @@ bundle-install-hook kakoune-selenized %{
   ln -sf "${kak_opt_bundle_path}/kakoune-selenized" "${kak_config}/colors/"
 }
 
+# kakoune-snippets
+bundle kakoune-snippets https://github.com/occivink/kakoune-snippets
+
+#endif
 # kakoune-qt
 hook global ModuleLoaded kakoune-qt %{
     alias global new kakqt-split-horizontal

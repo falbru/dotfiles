@@ -10,7 +10,7 @@
 declare-option str ls_command sh
 declare-option str-list ls_args -c %{
   echo ../
-  ls -A -p -L -- "$1"
+  ls -A -p -L --group-directories-first -- "$1"
 }
 declare-option str ls_working_directory
 

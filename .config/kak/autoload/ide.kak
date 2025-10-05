@@ -2,9 +2,13 @@ define-command ide %{
     rename-client ping
     kakqt-split-horizontal rename-client pong
 
+    focus ping
+
     set-option global jumpclient ping
     set-option global docsclient pong
     set-option global toolsclient pong
+
+    remove-hooks global ide
 
     hook -group ide global FocusIn ping %{
         evaluate-commands %sh{

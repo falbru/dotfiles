@@ -2,8 +2,8 @@
 Name=Kakoune Qt
 GenericName=Text Editor
 Comment=Modal code editor
-TryExec=kak-qt
-Exec=kak-qt %F
+TryExec=k
+Exec=k %F
 Terminal=false
 StartupWMClass=kak-qt
 Type=Application

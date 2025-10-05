@@ -1,3 +1,4 @@
 .config/kak/bundle/
 .config/kak/.recentf
 .config/kak/colors/
+.config/smartcat/.api_configs.toml

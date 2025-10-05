@@ -8,7 +8,7 @@ Icon=gmail
 Terminal=false
 Categories=Network;Email;
 StartupNotify=true
-Actions=account1;account2;account3;account4;
+Actions=account1;account2;account3;
 
 [Desktop Action account1]
 Name=Personal Account
@@ -19,9 +19,5 @@ Name=Abakus.no
 Exec=xdg-open "https://mail.google.com/mail/u/2/"
 
 [Desktop Action account3]
-Name=Samfundet
-Exec=xdg-open "https://mail.google.com/mail/u/3/"
-
-[Desktop Action account4]
 Name=Capra
-Exec=xdg-open "https://mail.google.com/mail/u/4/"
+Exec=xdg-open "https://mail.google.com/mail/u/3/"

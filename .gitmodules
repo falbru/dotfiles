@@ -1,3 +1,6 @@
 [submodule ".config/kak/autoload/plugins/filetree/filetree"]
 	path = .config/kak/autoload/plugins/filetree/filetree
 	url = git@github.com:falbru/kakoune-filetree
+[submodule ".config/kak/autoload/plugins/lf/kakoune-lf"]
+	path = .config/kak/autoload/plugins/lf/kakoune-lf
+	url = https://github.com/TeddyDD/kakoune-lf.git
