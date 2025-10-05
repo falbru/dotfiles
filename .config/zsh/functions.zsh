@@ -55,6 +55,11 @@ function ghq() {
   esac
 }
 
+lfcd () {
+    # `command` is needed in case `lfcd` is aliased to `lf`
+    cd "$(command lf -print-last-dir "$@")"
+}
+
 apt_fuzzy_install() {
   local pkgs=$(apt-cache search --names-only $1 | awk '{print $1}' | fzf --multi --preview 'apt-cache show {}')
   [ ${#pkgs[@]} -gt 0 ] && sudo apt install $pkgs

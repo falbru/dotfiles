@@ -16,6 +16,7 @@ alias \
     l.='eza -d .*' \
     lS='eza -al --sort=size' \
     lt='eza -al --sort=modified' \
+    lf='lfcd' \
     bat='batcat --style=plain' \
     fd='fdfind' \
     aptfi='apt_fuzzy_install' \

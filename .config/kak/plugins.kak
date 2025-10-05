@@ -53,34 +53,6 @@ hook global WinSetOption filetype=(javascript|typescript|c|cpp|python|go) %{
 # kak-tree-sitter
 eval %sh{ kak-tree-sitter -dks --init $kak_session --with-highlighting }
 
-# rainbower
-bundle kak-rainbower "https://github.com/crizan/kak-rainbower" %{
-    # TODO doesnt work
-    # set-option global rainbow_mode 0
-    # set-option global rainbow_check_templates Y
-
-    # hook global WinCreate .* %{
-    #   rainbow-enable-window
-    # }
-}
-
-# bundle kakoune-focus "https://github.com/caksoylar/kakoune-focus" %{
-#     map global user <space> ':focus-toggle<ret>' -docstring "toggle selections focus"
-# }
-
-bundle grep-expand.kak https://github.com/jtrv/grep-expand.kak
-
-# kakoune-lf
-bundle kakoune-lf https://github.com/TeddyDD/kakoune-lf
-
-# kak-harpoon
-bundle kak-harpoon https://github.com/raiguard/kak-harpoon %{
-    harpoon-add-bindings
-}
-
-# kakoune-filetree
-# bundle kakoune-filetree https://github.com/occivink/kakoune-filetree.git
-
 # kakoune-gdb
 bundle kakoune-gdb https://github.com/occivink/kakoune-gdb
 
@@ -93,28 +65,6 @@ bundle kakoune-grep-write "https://github.com/JacobTravers/kakoune-grep-write" %
   }
 }
 
-bundle-noload one.kak https://github.com/raiguard/one.kak
-bundle-install-hook one.kak %{
-  mkdir -p ${kak_config}/colors
-  ln -sf "${kak_opt_bundle_path}/one.kak" "${kak_config}/colors/"
-}
-
-bundle-noload kakoune-mysticaltutor https://github.com/caksoylar/kakoune-mysticaltutor
-bundle-install-hook kakoune-mysticaltutor %{
-  mkdir -p ${kak_config}/colors
-  ln -sf "${kak_opt_bundle_path}/kakoune-mysticaltutor" "${kak_config}/colors/"
-}
-
-bundle-noload kakoune-selenized https://github.com/TeddyDD/kakoune-selenized
-bundle-install-hook kakoune-selenized %{
-  mkdir -p ${kak_config}/colors
-  ln -sf "${kak_opt_bundle_path}/kakoune-selenized" "${kak_config}/colors/"
-}
-
-# kakoune-snippets
-bundle kakoune-snippets https://github.com/occivink/kakoune-snippets
-
-#endif
 # kakoune-qt
 hook global ModuleLoaded kakoune-qt %{
     alias global new kakqt-split-horizontal

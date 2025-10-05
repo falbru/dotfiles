@@ -3,12 +3,12 @@ type $1Props = {
 }
 
 const $1 = (props: $1Props) => {
-  const {} = props;
+	const {} = props;
 
-  return (
-    <>
-    </>
-  );
+	return (
+		<>
+		</>
+	);
 }
 
 export default $1;

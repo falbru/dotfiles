@@ -7,7 +7,7 @@ set previewer ~/bin/previewer
 # commands
 cmd open &{{
     case $(file --mime-type -Lb $f) in
-        text/*) lf -remote "send $id \$$EDITOR \$fx";;
+        text/*|application/javascript|application/x-shellscript|application/json) lf -remote "send $id \$$EDITOR \$fx";;
         *) for f in $fx; do $OPENER $f > /dev/null 2> /dev/null & done;;
     esac
 }}
@@ -85,14 +85,8 @@ cmd on-cd &{{
     else
         fmt="\033[32;1m%u@%h\033[0m:\033[34;1m%w\033[0m"
     fi
-    lf -remote "send $id set promptfmt \"$fmt\""
+    lf -remote "send $id :set promptfmt \"$fmt\""
 }}
-cmd on-cd &{{
-    printf "\033]0; $PWD\007" > /dev/tty
-}}
-
-on-cd
-
 cmd git_show ${{
     branch=$(git for-each-ref --format='%(refname:short)' refs/heads/ | fzf)
     for x in $fx; do
@@ -102,6 +96,31 @@ cmd git_show ${{
         git show $branch:$rel > $tmp_file
         lf -remote "send $id open $tmp_file"
     done
+}}
+
+cmd on-load &{{
+    cd "$(dirname "$1")" || exit 1
+    [ "$(git rev-parse --is-inside-git-dir 2>/dev/null)" = false ] || exit 0
+
+    cmds=""
+
+    for file in "$@"; do
+        case "$file" in
+            */.git|*/.git/*) continue;;
+        esac
+
+        status=$(git status --porcelain --ignored -- "$file" | cut -c1-2 | head -n1)
+
+        if [ -n "$status" ]; then
+            cmds="${cmds}addcustominfo \"${file}\" \"$status\"; "
+        else
+            cmds="${cmds}addcustominfo \"${file}\" ''; "
+        fi
+    done
+
+    if [ -n "$cmds" ]; then
+        lf -remote "send $id :$cmds"
+    fi
 }}
 
 # mappings

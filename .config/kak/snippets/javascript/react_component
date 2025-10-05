@@ -1,10 +1,10 @@
 const $1 = (props) => {
-  const {} = props;
+	const {} = props;
 
-  return (
-    <>
-    </>
-  );
+	return (
+		<>
+		</>
+	);
 }
 
 export default $1;
