@@ -123,7 +123,7 @@ alias global gst git-status
 
 # format
 hook global BufSetOption filetype=(c|cpp) %{
-    set-option buffer formatcmd 'clang-format'
+    set-option buffer formatcmd 'clang-format --style Microsoft'
 }
 
 hook global BufSetOption filetype=(javascript|typescript|json) %{

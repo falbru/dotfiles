@@ -2,7 +2,6 @@ set shell sh
 set shellopts '-eu'
 set ifs "\n"
 set scrolloff 10
-set previewer ~/bin/previewer
 
 # commands
 cmd open &{{
