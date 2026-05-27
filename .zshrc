@@ -50,14 +50,10 @@ source "$HOME/.config/zsh/tools.zsh"
 
 # Load plugins
 eval "$(zoxide init zsh)"
+eval "$(direnv hook zsh)"
 source "/usr/share/doc/fzf/examples/key-bindings.zsh"
 source "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 source "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-
-# pnpm
-export PNPM_HOME="/home/falk/.local/share/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
+export NVM_LAZY_LOAD=true
+export NVM_COMPLETION=true
+source "$HOME/.config/zsh/plugins/zsh-nvm/zsh-nvm.plugin.zsh"

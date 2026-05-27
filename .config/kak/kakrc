@@ -1,35 +1,32 @@
 # general
 set-option global grepcmd 'ag --column --nocolor --ignore-dir .git'
 set-option global autoreload yes
-set-option global ui_options 'kakqt_set_font=MonoLisa 10'
-set-option global scrolloff 5,5
-
+set-option global ui_options 'kakodemon_font=UbuntuMono 15' 'kakodemon_font_menu=UbuntuMono 13' 'kakodemon_font_infobox=UbuntuMono 13' 'kakodemon_font_statusbar=UbuntuMono 12'
 hook global -once ModuleLoaded (x11|wayland) %{ set-option global termcmd 'ptyxis -x' }
-
-# colorscheme mysticaltutor
 
 set-face global CurSearch +u
 hook global RegisterModified '/' %{ add-highlighter -override global/search regex "%reg{/}" 0:CurSearch }
 
 add-highlighter global/ regex \b(TODO|FIXME|XXX|NOTE)\b 0:default+rb
 
-# add-highlighter global/ show-matching
+add-highlighter global/ show-matching
 hook global BufCreate .* %[
-    add-highlighter buffer/ number-lines -relative -hlcursor -separator '  '
+    add-highlighter buffer/ number-lines -full-relative
     add-highlighter buffer/ wrap -indent
 ]
 
-# # statusline
-# hook global WinDisplay .* %{
-#     modeline-set-git-branch
-#     modeline-set-git-dirty
-#     modeline-set-git-fetch
-# }
+add_inactive_client_indicators
 
-# set-option global modelinefmt '{blue}%val{bufname} {red}[%opt{modeline_git_branch}%opt{modeline_git_fetch}] '
-# set-option -add global modelinefmt '{comment}%sh{ [ -n "$kak_opt_filetype" ] && printf "($kak_opt_filetype) "}'
-# set-option -add global modelinefmt '%val{cursor_line}:%val{cursor_char_column} '
-# set-option -add global modelinefmt '{default}{{context_info}} {{mode_info}} - %val{client}'
+# statusline
+hook global WinDisplay .* %{
+    modeline-update-git-branch
+    modeline-update-git-dirty
+    modeline-update-git-fetch
+}
+
+set-option global modelinefmt '{blue}%val{bufname} {comment}(%opt{filetype}) {red}[%opt{modeline_git_branch}{magenta}%opt{modeline_git_dirty}%opt{modeline_git_fetch}{red}] '
+set-option -add global modelinefmt '%val{cursor_line}:%val{cursor_char_column} '
+set-option -add global modelinefmt '{default}{{context_info}} {{mode_info}} - %val{client}'
 
 # enable editorconfig
 hook global BufOpenFile .* %{
@@ -56,10 +53,15 @@ hook global ModeChange .*:insert:.* %{ try %{
 
 # mappings
 map global insert <c-w> '<a-;>h<a-;>B<a-;>d'
+map global insert <c-f> '<right>'
+map global insert <c-b> '<left>'
+
+map global normal <esc> ':set-register slash ""<ret>'
 
 map global normal '#' ':comment-line<ret>'
 map global normal '<a-#>' ':comment-block<ret>'
-map global normal <esc> ':set-register slash ""<ret>'
+
+map global normal = ':format-selections<ret>'
 
 map global normal <c-o> <c-o>vv
 map global normal <c-i> <c-i>vv
@@ -68,17 +70,7 @@ map global normal "<a-*>" "*<percent>s<ret>" -docstring "Select all matching in 
 
 map -docstring "xml tag object" global object x %{c<lt>([\w.]+)\b[^>]*?(?<lt>!/)>,<lt>/([\w.]+)\b[^>]*?(?<lt>!/)><ret>}
 
-hook global -always BufOpenFifo '\*grep\*' %{
-    map global normal <minus> ':grep-next-match<ret>'
-    map global normal <a-minus> ':grep-previous-match<ret>'
-}
-
 map global normal <a-$> ':prompt -shell-completion echo-pipe: %{ echo %sh{ printf "%s" "$kak_selection" | $kak_text }}<ret>'
-
-map global normal "/" "/(?i)"
-map global normal "?" "?(?i)"
-map global normal "<a-/>" "<a-/>(?i)"
-map global normal "<a-?>" "<a-?>(?i)"
 
 hook global InsertCompletionShow .* %{ map window insert <tab> <c-n>; map window insert <s-tab> <c-p> }
 hook global InsertCompletionHide .* %{ unmap window insert <tab> <c-n>; unmap window insert <s-tab> <c-p> }
@@ -91,35 +83,24 @@ hook global InsertChar k %{ try %{
     unset-face window PrimaryCursorEol
 }}
 
-# functions
-define-command delete-buffers-matching -params 1 %{
-    evaluate-commands -buffer * %{
-        evaluate-commands %sh{ case "$kak_buffile" in $1) echo "delete-buffer" ;; esac }
-    }
-}
-
-declare-option -hidden str swap_buffer_target
-define-command swap-buffer-with -override -params 1 -client-completion %{
-    set-option global swap_buffer_target %val{bufname}
-    edit -scratch # release current window for other client
-    evaluate-commands -client %arg{1} "
-        set-option global swap_buffer_target %%val{bufname}
-        buffer %opt{swap_buffer_target}
-    "
-    delete-buffer # delete the temporary scratch buffer
-    buffer %opt{swap_buffer_target}
-}
+map global user -docstring 'enter grep mode' g ':enter-user-mode grep<ret>'
+map global user -docstring 'enter grep mode (locked)' G ':enter-user-mode -lock grep<ret>'
 
 # aliases
-alias global f find
+alias global f git-find
 hook -once global ModuleLoaded grep %{ alias global ag grep }
 alias global s snippet-insert
 alias global rf recentf
 alias global o xdg-open
 
+hook -once global ModuleLoaded kakodemon %{ alias global l kakodemon-layout }
+
 alias global ga git-add
 alias global gsw git-switch
 alias global gst git-status
+alias global gp git-push
+
+hook -once global ModuleLoaded fifo %{ alias global ! fifo }
 
 # format
 hook global BufSetOption filetype=(c|cpp) %{
@@ -143,11 +124,125 @@ hook global BufSetOption filetype=go %{
     hook -group autoformat window BufWritePre .* format
 }
 
-# source plugins
-source "%val{config}/plugins.kak"
+# window management
+define-command ide %{
+    new %{ rename-client tools }
+}
 
-# Source a local kak config if it exists
-try %{ source .local.kak }
+# === PLUGINS ===
 
-# Open dashboard
-dashboard
+## kak-bundle
+source "%val{config}/bundle/kak-bundle/rc/kak-bundle.kak"
+bundle-noload kak-bundle https://codeberg.org/jdugan6240/kak-bundle
+
+## kakodemon
+hook global ModuleLoaded kakodemon %{
+    alias global layout kakodemon-layout
+}
+
+## kak-lsp
+eval %sh{kak-lsp}
+
+hook global WinSetOption filetype=(javascript|typescript|c|cpp|python|go) %{
+    set-option window lsp_auto_highlight_references true
+    set-option window lsp_hover_max_lines 1000
+    set-option window lsp_hover_anchor true
+    set-option window lsp_snippet_support false
+
+    map window user -docstring 'enter lsp mode' l ':enter-user-mode lsp<ret>'
+
+    map window user -docstring 'open lsp hover' <space> ':lsp-hover<ret>'
+    map window user -docstring 'open lsp code actions' <s-space> ':lsp-code-actions<ret>'
+
+    lsp-auto-hover-insert-mode-enable
+    lsp-inlay-diagnostics-enable window
+    lsp-enable-window
+}
+
+## kak-tree-sitter
+eval %sh{ kak-tree-sitter -dks --init $kak_session --with-highlighting }
+
+## auto-pairs
+bundle auto-pairs.kak https://github.com/alexherbo2/auto-pairs.kak %{
+    enable-auto-pairs
+}
+
+## smarttab.kak
+bundle smarttab.kak https://github.com/andreyorst/smarttab.kak.git
+
+## kak-lf
+bundle kak-lf https://github.com/falbru/kak-lf
+
+## kak-ansi
+bundle kak-ansi https://github.com/eraserhd/kak-ansi %{
+    hook global BufOpenFifo '.*' %{
+        ansi-enable
+    }
+}
+
+## kakoune-repl-buffer
+bundle kakoune-repl-buffer https://gitlab.com/Screwtapello/kakoune-repl-buffer.git
+
+## kakoune-gdb
+bundle kakoune-gdb https://github.com/occivink/kakoune-gdb %{
+    define-command -override -params .. -file-completion gdb-session-new -docstring "
+    gdb-session-new [<arguments>]: starts a new gdb session
+    The arguments are passed to gdb. In particular, the first argument is the program to be debugged.
+    " %{
+        gdb-session-start-receiver
+        nop %sh{
+            # can't connect until socat has created the pty thing
+            while [ ! -e "${kak_opt_gdb_dir}/pty" ]; do
+                sleep 0.1
+            done
+        }
+        try %{
+            repl-buffer-new %opt{gdb_program} --init-eval-command "set mi-async on" --init-eval-command "new-ui mi3 %opt{gdb_dir}/pty" %arg{@}
+        } catch %{
+            gdb-session-stop-receiver
+            fail 'The ''terminal'' command must be defined to start a gdb session'
+        }
+    }
+}
+
+## kak-harpoon
+bundle kak-harpon https://codeberg.org/raiguard/kak-harpoon %{
+    harpoon-add-bindings
+
+    hook global BufCreate \*harpoon\* %{
+        map buffer normal <ret> ':harpoon-nav %val{cursor_line}; delete-buffer *harpoon*<ret>'
+    }
+}
+
+## kakoune-grep-write
+bundle kakoune-grep-write https://github.com/JacobTravers/kakoune-grep-write %{
+    hook global WinSetOption filetype=(grep|lsp-goto) %{
+        alias window w grep-write
+    }
+}
+
+## xiki.kak
+bundle xiki.kak https://github.com/cadrgtsecond/xiki.kak %{
+    hook -group xiki global WinSetOption filetype=xiki %{
+        map window normal <ret> 'x<a-:><a-;>: xiki<ret>;'
+        map window normal <a-ret> 'x: xiki-execute -fifo<ret>'
+    }
+
+    hook -group xiki global WinCreate '\*scratch\*' %{
+        set-option window filetype xiki
+    }
+}
+bundle-install-hook xiki.kak %{
+    ./install
+    cp -rf doc/ ~/.config/kak/autoload/doc/xiki/
+}
+
+## secure-local-kakrc
+bundle secure-local-kakrc https://codeberg.org/ficd/secure-local-kakrc %{
+    require-module local-kakrc
+    set-option global local_kakrc_autoload true
+}
+
+bundle-theme dabruin.kak https://codeberg.org/seminorm/dabruin.kak.git
+
+colorscheme intern

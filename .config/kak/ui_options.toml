@@ -1,0 +1,23 @@
+[kakodemon]
+font           = UbuntuMono 15
+font_menu      = UbuntuMono 13
+font_infobox   = UbuntuMono 13
+font_statusbar = UbuntuMono 12
+
+[kakodemon.color]
+black=rgb:1c1c1c
+red=rgb:af5f5f
+green=rgb:5f875f
+yellow=rgb:87875f
+blue=rgb:5f87af
+magenta=rgb:5f5f87
+cyan=rgb:5f8787
+white=rgb:6c6c6c
+bright_black=rgb:444444
+bright_red=rgb:ff8700
+bright_green=rgb:87af87
+bright_yellow=rgb:ffffaf
+bright_blue=rgb:87afd7
+bright_magenta=rgb:8787af
+bright_cyan=rgb:5fafaf
+bright_white=rgb:ffffff

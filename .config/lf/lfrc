@@ -27,6 +27,20 @@ cmd delete ${{
     [ "$ans" = "y" ] && rm -rf $fx
 }}
 
+cmd trash ${{
+    set -f
+    printf "$fx\n"
+    printf "trash?[y/n]"
+    read ans
+    [ "$ans" = "y" ] || exit
+    if gio trash 2>/dev/null; then
+        gio trash $fx
+    else
+        mkdir -p ~/.trash
+        mv -- $fx ~/.trash
+    fi
+}}
+
 cmd moveto ${{
     clear; tput cup $(($(tput lines)/3)); tput bold
     set -f
@@ -77,6 +91,7 @@ cmd zip ${{
     rm -rf $1
 }}
 
+# git
 cmd on-cd &{{
     if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
         branch=$(git branch --show-current 2>/dev/null) || true
@@ -97,6 +112,8 @@ cmd git_show ${{
     done
 }}
 
+set info custom
+
 cmd on-load &{{
     cd "$(dirname "$1")" || exit 1
     [ "$(git rev-parse --is-inside-git-dir 2>/dev/null)" = false ] || exit 0
@@ -111,19 +128,47 @@ cmd on-load &{{
         status=$(git status --porcelain --ignored -- "$file" | cut -c1-2 | head -n1)
 
         if [ -n "$status" ]; then
-            cmds="${cmds}addcustominfo \"${file}\" \"$status\"; "
+            cmds="${cmds}addcustominfo ${file} \"$status\"; "
         else
-            cmds="${cmds}addcustominfo \"${file}\" ''; "
+            cmds="${cmds}addcustominfo ${file} ''; "
         fi
     done
 
-    if [ -n "$cmds" ]; then
-        lf -remote "send $id :$cmds"
+    lf -remote "send $id :$cmds"
+}}
+
+# fzf
+cmd fzf_jump ${{
+    res="$(find . -type d 2>/dev/null | fzf --reverse --header="Jump to location")"
+    if [ -n "$res" ]; then
+        if [ -d "$res" ]; then
+            cmd="cd"
+        else
+            cmd="select"
+        fi
+        res="$(printf '%s' "$res" | sed 's/\\/\\\\/g;s/"/\\"/g')"
+        lf -remote "send $id $cmd \"$res\""
     fi
+}}
+map <c-f> :fzf_jump
+
+# zoxide
+cmd z %{{
+    result="$(zoxide query --exclude "$PWD" "$@" | sed 's/\\/\\\\/g;s/"/\\"/g')"
+    lf -remote "send $id cd \"$result\""
+}}
+
+cmd zi ${{
+    result="$(zoxide query -i | sed 's/\\/\\\\/g;s/"/\\"/g')"
+    lf -remote "send $id cd \"$result\""
+}}
+
+cmd on-cd &{{
+    zoxide add "$PWD"
 }}
 
 # mappings
 map r push :rename<space>
-map <delete> delete
+map <delete> trash
 map x $$f
 map X !$f

@@ -1,0 +1,57 @@
+#!/bin/env python3
+import sys
+import re
+
+case_styles = {
+    "camel":      lambda words: words[0].lower() + "".join(w.capitalize() for w in words[1:]),
+    "pascal":     lambda words: "".join(w.capitalize() for w in words),
+    "snake":      lambda words: "_".join(words).lower(),
+    "kebab":      lambda words: "-".join(words).lower(),
+    "uppersnake": lambda words: "_".join(words).upper(),
+    "upperkebab": lambda words: "-".join(words).upper(),
+    "lowercase":  lambda words: "".join(words).lower(),
+    "uppercase":  lambda words: "".join(words).upper(),
+}
+
+shorthand_map = {
+    "c": "camel",
+    "p": "pascal",
+    "s": "snake",
+    "sn": "snake",
+    "k": "kebab",
+    "us": "uppersnake",
+    "uk": "upperkebab",
+    "l": "lowercase",
+    "u": "uppercase",
+}
+
+def split_into_words(s):
+    return re.findall(r"[A-Z][a-z]+|[a-z]+|[A-Z]+(?=[A-Z][a-z]|_|-|\s|$)|[a-z]+(?=_|-|\s|$)", s)
+
+def convert_case(target_style, s):
+    tokens = re.findall(r"([a-zA-Z_][a-zA-Z0-9_]*)|([^a-zA-Z0-9_]+)", s)
+    result = []
+    for var, sep in tokens:
+        if var:
+            words = split_into_words(var)
+            result.append(case_styles[target_style](words))
+        if sep:
+            result.append(sep)
+    return "".join(result)
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: caseconv <target_case> [string]")
+        print("Shorthand: c=camel, p=pascal, s=snake, sn=snake, k=kebab, us=uppersnake, uk=upperkebab, l=lowercase, u=uppercase")
+        sys.exit(1)
+
+    target_style = sys.argv[1]
+    target_style = shorthand_map.get(target_style, target_style)
+    if target_style not in case_styles:
+        print(f"Error: Unknown case style '{target_style}'. Available: {', '.join(case_styles.keys())}")
+        print("Shorthand: c=camel, p=pascal, s=snake, sn=snake, k=kebab, us=uppersnake, uk=upperkebab, l=lowercase, u=uppercase")
+        sys.exit(1)
+
+    s = sys.argv[2] if len(sys.argv) > 2 else sys.stdin.read()
+    result = convert_case(target_style, s)
+    print(result, end="")

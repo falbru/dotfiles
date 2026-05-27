@@ -1,11 +1,11 @@
 [Desktop Entry]
-Name=Kakoune Qt
+Name=Kakodemon
 GenericName=Text Editor
 Comment=Modal code editor
 TryExec=k
 Exec=k %F
 Terminal=false
-StartupWMClass=kak-qt
+StartupWMClass=kakodemon
 Type=Application
 Keywords=Text;editor;
 Icon=kakoune

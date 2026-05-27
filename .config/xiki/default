@@ -1,0 +1,34 @@
+#!/bin/sh
+if [ -d "$1" ]; then
+    [ -z "$2" ] && exec ls -Ap --group-directories-first "$1"
+    cd "$1" || exit
+    shift
+    exec xiki "$@"
+fi
+
+[ -x "$1" ] && exec "./$1"
+
+if [ -f "$1" ]; then
+    if [ -n "$kak_session" ]; then
+        mime=$(file --mime-type -b "$1")
+        case "$mime" in
+            text/*|application/x-shellscript|application/json|application/javascript)
+                kak -p "$kak_session" <<END
+evaluate-commands -client '$kak_client' %{
+    evaluate-commands -try-client %opt{jumpclient} %{
+        edit '$PWD/$1'
+    }
+}
+END
+                exit
+                ;;
+        esac
+    fi
+
+    exec xdg-open "$1"
+fi
+
+[ -z "$2" ] && exec sh -c "$1"
+
+shift
+exec xiki "$@"

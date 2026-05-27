@@ -13,7 +13,11 @@ define-command grep-buffers -params 1.. -docstring "grep in all open file buffer
             printf "grep %s %s" "$args" "$buffiles"
         else
             printf "echo -markup '{Error}No file buffers to grep'"
-            printf "hello"
         fi
     }
 }
+
+
+
+
+

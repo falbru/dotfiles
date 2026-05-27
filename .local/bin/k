@@ -1,27 +1,97 @@
 #!/bin/sh
 
-wait_for_session() {
-    session=$1
-    while ! kak -l | grep -q -F -x "$session"; do
-        sleep 0.1
-    done
+session_name=
+session_extra_args=
+
+show_help() {
+    cat <<'EOF'
+Usage: k [OPTIONS] [FILE...] [+<line>[:<col>]|+:]
+
+Kakoune wrapper script for managing sessions.
+
+Options:
+    -c SESSION        Connect to existing session SESSION (don't spawn new)
+    -s SESSION        Spawn and connect to session SESSION
+    -n                Do not source kakrc files on startup
+    -h, --help        Show this help message
+
+Arguments:
+    FILE...           Files to open in the session
+    [+<line>[:<col>]] Edit file at specific line (and column)
+    [+:]              Edit file at last position
+EOF
 }
 
-launch_kak_qt() {
-    (kak-qt "$@" >/dev/null 2>&1 &)
+while [ $# -gt 0 ]; do
+    case $1 in
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        -c)
+            shift
+            if [ -n "$1" ] && [ "${1#-}" = "$1" ]; then
+                session_name="$1"
+                shift
+            else
+                printf 'error: -c requires a session name\n' >&2
+                exit 1
+            fi
+            ;;
+        -s)
+            shift
+            if [ -n "$1" ] && [ "${1#-}" = "$1" ]; then
+                session_name="$1"
+                shift
+            else
+                printf 'error: -s requires a session name\n' >&2
+                exit 1
+            fi
+            ;;
+        -n)
+            session_extra_args="-n"
+            shift
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+wait_for_kak_session() {
+    session_name_arg="$1"
+    tmpdir=""
+
+    cleanup() {
+        trap - EXIT HUP TERM INT
+        if [ -n "$tmpdir" ]; then rm -rf "$tmpdir"; fi
+        if [ -n "$1" ]; then trap - "$1"; kill -s "$1" "$$"; fi
+    }
+
+    tmpdir=$(mktemp -d) || return 1
+    trap 'cleanup' EXIT
+    trap 'cleanup HUP' HUP
+    trap 'cleanup TERM' TERM
+    trap 'cleanup INT' INT
+
+    mkfifo -m 600 "$tmpdir/pipe"
+    setsid kak -ui json -d -s "$session_name_arg" -E "echo -to-file $tmpdir/pipe ' '" $session_extra_args &
+    <"$tmpdir/pipe"
 }
 
 kak -clear
 
-if [ "$(git rev-parse --show-toplevel 2> /dev/null)" ]; then
-    git_dir=$(basename "$(git rev-parse --show-toplevel | tr -d '.')")
-
-    if ! kak -l | grep -E "^$git_dir\$"; then
-        setsid kak -d -s "$git_dir" &
-        wait_for_session "$git_dir"
+if [ -z "$session_name" ]; then
+    git_toplevel=$(git rev-parse --show-toplevel 2>/dev/null)
+    if [ -n "$git_toplevel" ]; then
+        session_name=$(basename "$git_toplevel" | tr -d '\n' | tr -c '[:alnum:]-' '_')
+    else
+        session_name="default"
     fi
 
-    launch_kak_qt -c "$git_dir" "$@"
-else
-    launch_kak_qt -c "default" "$@"
+    if ! kak -l | grep -qe "^$session_name\$"; then
+        wait_for_kak_session "$session_name"
+    fi
 fi
+
+setsid kakod -c "$session_name" "$@" >/dev/null 2>&1 &
