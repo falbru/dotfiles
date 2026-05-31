@@ -86,6 +86,10 @@ hook global InsertChar k %{ try %{
 map global user -docstring 'enter grep mode' g ':enter-user-mode grep<ret>'
 map global user -docstring 'enter grep mode (locked)' G ':enter-user-mode -lock grep<ret>'
 
+map global normal <minus> ':enter-user-mode surround<ret>'
+map global normal <a-minus> ':enter-user-mode surround-delete<ret>'
+map global insert <a-x> '<esc>:prompt "Tag: " %{ evaluate-commands %sh{ printf "%s\n" "surround-insert-tag $kak_text; execute-keys -with-hooks i" } }<ret>'
+
 # aliases
 alias global f git-find
 hook -once global ModuleLoaded grep %{ alias global ag grep }
@@ -236,6 +240,9 @@ bundle-install-hook xiki.kak %{
     ./install
     cp -rf doc/ ~/.config/kak/autoload/doc/xiki/
 }
+
+## selery.kak
+bundle selery.kak https://github.com/ftonneau/selery.kak
 
 ## secure-local-kakrc
 bundle secure-local-kakrc https://codeberg.org/ficd/secure-local-kakrc %{

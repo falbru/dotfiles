@@ -54,6 +54,4 @@ eval "$(direnv hook zsh)"
 source "/usr/share/doc/fzf/examples/key-bindings.zsh"
 source "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 source "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-export NVM_LAZY_LOAD=true
-export NVM_COMPLETION=true
-source "$HOME/.config/zsh/plugins/zsh-nvm/zsh-nvm.plugin.zsh"
+source "$HOME/.config/zsh/plugins/zsh-nvm-lazy-load/zsh-nvm-lazy-load.plugin.zsh"
