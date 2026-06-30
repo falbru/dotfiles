@@ -4,4 +4,6 @@ export SHELL="/bin/zsh"
 export XDG_DATA_DIRS="$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:$XDG_DATA_DIRS"
 export XCURSOR_THEME="Yaru"
 
+export ZSH_IGNORED_MODULES=("nvm" "pnpm" "pyenv")
+
 . "$HOME/.cargo/env"

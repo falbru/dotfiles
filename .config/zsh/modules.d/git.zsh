@@ -1,40 +1,3 @@
-# Abbreviations
-alias \
-    ..="cd .." \
-    ..="cd .." \
-    ...="cd ../.." \
-    ....="cd ../../.." \
-    .....="cd ../../../.." \
-    e="$EDITOR" \
-    o="xdg-open" \
-    h="history" \
-    c='clear' \
-    l='eza -al' \
-    ls='eza' \
-    la='eza -a' \
-    ll='eza -l' \
-    l.='eza -d .*' \
-    lS='eza -al --sort=size' \
-    lt='eza -al --sort=modified' \
-    lf='lfcd' \
-    bat='batcat --style=plain' \
-    fd='fdfind' \
-    aptfi='apt_fuzzy_install' \
-    aptrm='sudo apt remove' \
-    aptupg='sudo apt update && sudo apt upgrade && sudo apt autoremove'
-
-# Add common arguments to commands by default
-alias \
-    cp="cp -iv" \
-    mv="mv -iv" \
-    rm="rm -vI" \
-    mkdir="mkdir -pv" \
-    grep="grep --color=auto" \
-    egrep="grep -E --color=auto" \
-    fgrep="grep -F --color=auto" \
-    lsblk="lsblk -e7"
-
-# Git
 function git_current_branch() {
     git rev-parse --abbrev-ref HEAD
 }
@@ -113,8 +76,3 @@ alias \
     gsh='git show' \
     gwip='git add --all && git commit -m WIP' \
     grwip='git reset HEAD~'
-
-# GitHub
-alias \
-    ghrepo='gh repo view --web >/dev/null 2>&1' \
-    ghpr='gh pr view --web >/dev/null 2>&1'

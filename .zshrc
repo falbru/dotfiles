@@ -18,14 +18,6 @@ setopt hist_find_no_dups
 bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
 
-# Setup pure prompt
-fpath+=($HOME/.zsh/pure)
-
-autoload -U promptinit; promptinit
-prompt pure
-
-zstyle :prompt:pure:prompt:success color green
-
 # Auto/tab completion
 autoload -U compinit
 zstyle ':completion:*' menu select
@@ -43,15 +35,34 @@ autoload -z edit-command-line
 zle -N edit-command-line
 bindkey "^X^E" edit-command-line
 
-# Load external config files
-source "$HOME/.config/zsh/functions.zsh"
-source "$HOME/.config/zsh/aliases.zsh"
-source "$HOME/.config/zsh/tools.zsh"
+# Aliases
+alias \
+  ..="cd .." \
+  ..="cd .." \
+  ...="cd ../.." \
+  ....="cd ../../.." \
+  .....="cd ../../../.." \
+  e="$EDITOR" \
+  o="xdg-open" \
+  h="history" \
+  c='clear' \
+  l='ls -al --color=auto' \
+  ls='ls --color=auto' \
+  la='ls -a --color=auto' \
+  ll='ls -l --color=auto' \
+  l.='ls -d .* --color=auto' \
+  lS='ls -al --sort=size --color=auto' \
+  lt='ls -al --sort=modified --color=auto' \
+  cp="cp -iv" \
+  mv="mv -iv" \
+  rm="rm -vI" \
+  mkdir="mkdir -pv" \
+  grep="grep --color=auto" \
+  egrep="grep -E --color=auto" \
+  fgrep="grep -F --color=auto" \
+  lsblk="lsblk -e7"
 
-# Load plugins
-eval "$(zoxide init zsh)"
-eval "$(direnv hook zsh)"
-source "/usr/share/doc/fzf/examples/key-bindings.zsh"
-source "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-source "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-source "$HOME/.config/zsh/plugins/zsh-nvm-lazy-load/zsh-nvm-lazy-load.plugin.zsh"
+# Load zsh config files
+for _file in .config/zsh/*.zsh; do
+    source "$_file"
+done

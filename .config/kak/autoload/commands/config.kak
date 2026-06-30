@@ -13,5 +13,5 @@ If no file is specified, edit kakrc
 }
 
 complete-command -menu config shell-script-candidates %{
-    git -C $kak_config ls-files -c .
+    git -C $kak_config ls-files -c -o --exclude-standard .
 }
