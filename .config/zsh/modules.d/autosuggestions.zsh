@@ -1,1 +1,1 @@
-source "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+[ -f "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ] && source "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
