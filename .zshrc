@@ -59,6 +59,6 @@ alias \
   lsblk="lsblk -e7"
 
 # Load zsh config files
-for _file in .config/zsh/*.zsh; do
+for _file in $HOME/.config/zsh/*.zsh; do
     source "$_file"
 done

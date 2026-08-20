@@ -1,5 +1,5 @@
 [default]
-api = "anthropic"
+api = "mistral"
 
 [[default.messages]]
 role = "system"
@@ -10,5 +10,5 @@ Never write ``` around your answer, provide only the result of the task you are 
 """
 
 [empty]
-api = "anthropic"
+api = "mistral"
 messages = []

@@ -1,3 +1,4 @@
 .config/kak/bundle/
 .config/kak/.recentf
 .config/smartcat/.api_configs.toml
+.config/smartcat/conversation.toml
