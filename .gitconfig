@@ -1,7 +1,7 @@
 [user]
 	email = falk.bruskeland@gmail.com
 	name = Falk Bruskeland
-	signingkey = D90988F436C14DBF
+	signingkey = 959D4FA6F86595B3
 [core]
 	editor = kak
 	pager = delta
